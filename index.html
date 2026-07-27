@@ -4,205 +4,618 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Список тех, кто не согласился</title>
-<meta name="description" content="Реестр российских политиков, журналистов и правозащитников, выступивших против власти: кого убили, кто в заключении, кто продолжает работать из-за границы.">
+<meta name="description" content="Реестр российских политиков, журналистов, правозащитников, деятелей культуры и науки, выступивших против власти.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-/* ─────────────────────────────────────────────────────────────
-   ТОКЕНЫ MATERIAL 3
-   Нейтрали — базовые тональные палитры M3.
-   --accent подставляется скриптом из цвета человека в фокусе.
-   ───────────────────────────────────────────────────────────── */
-:root{
-  --accent:#E53935;
-  --radius-xl:28px; --radius-l:20px; --radius-m:12px; --radius-s:8px;
-  --ease:cubic-bezier(.2,0,0,1);
-  --dur:.5s;
-}
-[data-theme="dark"]{
-  --surface:#121016;
-  --surface-dim:#0C0A10;
-  --container:#1D1B21;
-  --container-high:#272430;
-  --on-surface:#E6E1E9;
-  --on-variant:#B5AEBE;
-  --outline:#48434F;
-}
-[data-theme="light"]{
-  --surface:#FCF8FD;
-  --surface-dim:#F1ECF4;
-  --container:#F2ECF5;
-  --container-high:#E9E1EE;
-  --on-surface:#1C1B1F;
-  --on-variant:#4A454E;
-  --outline:#CBC3D0;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0; background:var(--surface); color:var(--on-surface);
-  font-family:'Roboto Flex',system-ui,sans-serif; font-weight:400;
-  font-size:17px; line-height:1.6;
-  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
-  overflow-x:hidden;
-}
-/* мягкое свечение цвета текущего человека */
-body::before{
-  content:''; position:fixed; inset:-25vh 0 auto 0; height:70vh; z-index:0; pointer-events:none;
-  background:radial-gradient(60% 60% at 50% 0%, color-mix(in oklab, var(--accent) 26%, transparent) 0%, transparent 70%);
-  transition:background 1.1s var(--ease);
-}
-.wrap{position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:0 20px}
-
-/* ── ВЕРХНЯЯ ПАНЕЛЬ ───────────────────────────────────────── */
-.topbar{
-  position:sticky; top:0; z-index:20;
-  display:flex; align-items:center; justify-content:space-between; gap:16px;
-  padding:12px 20px; backdrop-filter:blur(18px);
-  background:color-mix(in oklab, var(--surface) 82%, transparent);
-  border-bottom:1px solid color-mix(in oklab, var(--outline) 50%, transparent);
-}
-.mark{
-  font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.12em;
-  text-transform:uppercase; color:var(--on-variant);
-}
-.mark b{color:var(--accent); transition:color var(--dur) var(--ease)}
-.icon-btn{
-  border:0; cursor:pointer; width:44px; height:44px; border-radius:50%;
-  background:transparent; color:var(--on-surface); font-size:18px;
-  display:grid; place-items:center; transition:background .2s var(--ease);
-}
-.icon-btn:hover{background:var(--container-high)}
-.icon-btn:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
-
-/* ── ГЕРОЙ ────────────────────────────────────────────────── */
-.hero{padding:72px 0 40px}
-.eyebrow{
-  font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.14em;
-  text-transform:uppercase; color:var(--on-variant); margin:0 0 20px;
-}
-h1{
-  font-family:'Unbounded',sans-serif; font-weight:800;
-  font-size:clamp(34px,7vw,68px); line-height:1.02; letter-spacing:-.02em;
-  margin:0 0 24px; max-width:14ch;
-}
-.lede{font-size:clamp(17px,2.2vw,21px); color:var(--on-variant); max-width:56ch; margin:0 0 44px}
-.lede b{color:var(--on-surface); font-weight:500}
-
-/* СИГНАТУРА: стена имён. Наведение перекрашивает всю страницу в цвет человека */
-.namewall{
-  font-family:'JetBrains Mono',monospace; font-size:13px; line-height:2.1;
-  color:var(--on-variant); margin:0 0 12px; padding:24px;
-  border:1px solid color-mix(in oklab, var(--outline) 60%, transparent);
-  border-radius:var(--radius-l);
-  background:color-mix(in oklab, var(--accent) 5%, var(--surface));
-  transition:background 1.1s var(--ease);
-}
-.namewall a{
-  color:inherit; text-decoration:none; padding:2px 5px; border-radius:6px;
-  transition:color .25s var(--ease), background .25s var(--ease);
-}
-.namewall a:hover,.namewall a:focus-visible{
-  color:var(--surface); background:var(--nm); outline:none;
-}
-.namewall a.gone{text-decoration:line-through; text-decoration-thickness:1px; opacity:.72}
-.wall-key{font-size:12px; color:var(--on-variant); opacity:.8; margin:0 0 64px}
-.wall-key s{opacity:.7}
-
-/* ── ФИЛЬТРЫ ──────────────────────────────────────────────── */
-.chips{display:flex; flex-wrap:wrap; gap:10px; margin:0 0 56px; padding:0}
-.chip{
-  font:500 14px/1 'Roboto Flex',sans-serif; cursor:pointer;
-  padding:11px 18px; border-radius:var(--radius-s);
-  border:1px solid var(--outline); background:transparent; color:var(--on-surface);
-  transition:all .25s var(--ease);
-}
-.chip:hover{background:var(--container)}
-.chip[aria-pressed="true"]{
-  background:color-mix(in oklab, var(--accent) 30%, var(--container));
-  border-color:transparent;
-}
-.chip:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
-
-/* ── СЕКЦИИ ───────────────────────────────────────────────── */
-.group{margin:0 0 88px}
-.group[hidden]{display:none}
-.group-head{
-  display:flex; align-items:baseline; gap:16px; flex-wrap:wrap;
-  padding-bottom:16px; margin-bottom:48px;
-  border-bottom:1px solid color-mix(in oklab, var(--outline) 60%, transparent);
-}
-.group-head h2{
-  font-family:'Unbounded',sans-serif; font-weight:600; font-size:clamp(22px,3.4vw,32px);
-  margin:0; letter-spacing:-.01em;
-}
-.group-count{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--on-variant)}
-.group-note{flex-basis:100%; margin:8px 0 0; color:var(--on-variant); font-size:15px; max-width:64ch}
-
-/* ── КАРТОЧКА ЧЕЛОВЕКА ────────────────────────────────────── */
-.person{
-  display:grid; grid-template-columns:200px 1fr; gap:36px; align-items:start;
-  margin:0 0 56px; padding:24px; border-radius:var(--radius-xl);
-  background:color-mix(in oklab, var(--pc) 7%, var(--container));
-  opacity:0; transform:translateY(22px);
-  transition:opacity .7s var(--ease), transform .7s var(--ease), background .3s var(--ease);
-}
-.person.in{opacity:1; transform:none}
-.person.flip{grid-template-columns:1fr 200px}
-.person.flip .portrait{order:2}
-.portrait{
-  position:relative; width:200px; aspect-ratio:1/1.12; border-radius:var(--radius-l);
-  overflow:hidden; background:linear-gradient(150deg, color-mix(in oklab, var(--pc) 55%, #000) 0%, color-mix(in oklab, var(--pc) 18%, var(--container-high)) 100%);
-  display:grid; place-items:center;
-}
-.portrait img{width:100%; height:100%; object-fit:cover; display:block}
-.portrait .initials{
-  position:absolute; font-family:'Unbounded',sans-serif; font-weight:600; font-size:44px;
-  color:color-mix(in oklab, var(--pc) 70%, #fff); letter-spacing:.02em;
-}
-.portrait img[src]:not([src=""]) + .initials{display:none}
-.meta{
-  font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.08em;
-  text-transform:uppercase; color:var(--pc); margin:2px 0 10px; filter:saturate(1.1);
-}
-[data-theme="light"] .meta{color:color-mix(in oklab, var(--pc) 72%, #000)}
-.person h3{
-  font-family:'Unbounded',sans-serif; font-weight:600; font-size:clamp(20px,2.6vw,27px);
-  margin:0 0 14px; letter-spacing:-.01em; line-height:1.2;
-}
-.person p.text{margin:0 0 18px; color:var(--on-variant); max-width:60ch}
-.record{
-  display:inline-block; font-family:'JetBrains Mono',monospace; font-size:12.5px;
-  padding:8px 14px; border-radius:var(--radius-s); margin:0;
-  background:color-mix(in oklab, var(--pc) 16%, var(--container-high));
-  color:var(--on-surface);
+:root {
+  --accent: #E53935;
+  --radius-xl: 28px; 
+  --radius-l: 20px; 
+  --radius-m: 12px; 
+  --radius-s: 8px;
+  --ease: cubic-bezier(.2, 0, 0, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur: .5s;
 }
 
-/* ── ПОДВАЛ ───────────────────────────────────────────────── */
-footer{
-  border-top:1px solid color-mix(in oklab, var(--outline) 60%, transparent);
-  padding:48px 0 80px; color:var(--on-variant); font-size:14px;
+[data-theme="dark"] {
+  --surface: #121016;
+  --surface-dim: #0C0A10;
+  --container: #1D1B21;
+  --container-high: #272430;
+  --on-surface: #E6E1E9;
+  --on-variant: #B5AEBE;
+  --outline: #48434F;
 }
-footer h4{font-family:'Unbounded',sans-serif; font-weight:400; font-size:15px; margin:0 0 12px; color:var(--on-surface)}
-footer a{color:var(--accent); text-decoration:none; border-bottom:1px solid transparent}
-footer a:hover{border-bottom-color:currentColor}
-footer p{max-width:66ch; margin:0 0 14px}
 
-/* ── АДАПТИВ ──────────────────────────────────────────────── */
-@media (max-width:760px){
-  body{font-size:16px}
-  .hero{padding:44px 0 28px}
-  .person,.person.flip{grid-template-columns:1fr; gap:20px; padding:18px}
-  .person.flip .portrait{order:0}
-  .portrait{width:100%; max-width:220px; aspect-ratio:1/1}
-  .namewall{padding:18px; line-height:2.3}
-  .group{margin-bottom:64px}
+[data-theme="light"] {
+  --surface: #FCF8FD;
+  --surface-dim: #F1ECF4;
+  --container: #F2ECF5;
+  --container-high: #E9E1EE;
+  --on-surface: #1C1B1F;
+  --on-variant: #4A454E;
+  --outline: #CBC3D0;
 }
-@media (prefers-reduced-motion:reduce){
-  *{transition-duration:.01ms !important; animation-duration:.01ms !important}
-  html{scroll-behavior:auto}
-  .person{opacity:1; transform:none}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0; 
+  background: var(--surface); 
+  color: var(--on-surface);
+  font-family: 'Roboto Flex', system-ui, sans-serif; 
+  font-weight: 400;
+  font-size: 17px; 
+  line-height: 1.6;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+  overflow-x: hidden;
+}
+
+/* Запрет скролла при открытом модальном окне */
+body.modal-open {
+  overflow: hidden !important;
+}
+
+body::before {
+  content: ''; 
+  position: fixed; 
+  inset: -25vh 0 auto 0; 
+  height: 70vh; 
+  z-index: 0; 
+  pointer-events: none;
+  background: radial-gradient(60% 60% at 50% 0%, color-mix(in oklab, var(--accent) 26%, transparent) 0%, transparent 70%);
+  transition: background 1.1s var(--ease);
+}
+
+.wrap { 
+  position: relative; 
+  z-index: 1; 
+  max-width: 1240px; 
+  margin: 0 auto; 
+  padding: 0 24px; 
+}
+
+/* Верхняя панель */
+.topbar {
+  position: sticky; 
+  top: 0; 
+  z-index: 20;
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: 16px;
+  padding: 14px 24px; 
+  backdrop-filter: blur(18px);
+  background: color-mix(in oklab, var(--surface) 82%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, var(--outline) 50%, transparent);
+}
+
+.mark {
+  font-family: 'JetBrains Mono', monospace; 
+  font-size: 12px; 
+  letter-spacing: .12em;
+  text-transform: uppercase; 
+  color: var(--on-variant);
+}
+.mark b { color: var(--accent); transition: color var(--dur) var(--ease); }
+
+.icon-btn {
+  border: 0; 
+  cursor: pointer; 
+  width: 44px; 
+  height: 44px; 
+  border-radius: 50%;
+  background: transparent; 
+  color: var(--on-surface); 
+  font-size: 18px;
+  display: grid; 
+  place-items: center; 
+  transition: background .2s var(--ease);
+}
+.icon-btn:hover { background: var(--container-high); }
+
+/* Герой */
+.hero { padding: 64px 0 32px; }
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace; 
+  font-size: 12px; 
+  letter-spacing: .14em;
+  text-transform: uppercase; 
+  color: var(--on-variant); 
+  margin: 0 0 20px;
+}
+h1 {
+  font-family: 'Unbounded', sans-serif; 
+  font-weight: 800;
+  font-size: clamp(34px, 6.5vw, 64px); 
+  line-height: 1.05; 
+  letter-spacing: -.02em;
+  margin: 0 0 24px; 
+  max-width: 15ch;
+}
+.lede { font-size: clamp(17px, 2.2vw, 21px); color: var(--on-variant); max-width: 58ch; margin: 0 0 40px; }
+.lede b { color: var(--on-surface); font-weight: 500; }
+
+/* Стена имён */
+.namewall {
+  font-family: 'JetBrains Mono', monospace; 
+  font-size: 13px; 
+  line-height: 2.1;
+  color: var(--on-variant); 
+  margin: 0 0 12px; 
+  padding: 24px;
+  border: 1px solid color-mix(in oklab, var(--outline) 60%, transparent);
+  border-radius: var(--radius-l);
+  background: color-mix(in oklab, var(--accent) 5%, var(--surface));
+  transition: background 1.1s var(--ease);
+}
+.namewall a {
+  color: inherit; 
+  text-decoration: none; 
+  padding: 2px 6px; 
+  border-radius: 6px;
+  transition: color .25s var(--ease), background .25s var(--ease);
+}
+.namewall a:hover, .namewall a:focus-visible {
+  color: var(--surface); 
+  background: var(--nm); 
+  outline: none;
+}
+.namewall a.gone { text-decoration: line-through; opacity: .72; }
+.wall-key { font-size: 12px; color: var(--on-variant); opacity: .8; margin: 0 0 48px; }
+
+/* Элементы управления: поиск и двухнедельные фильтры */
+.controls-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 48px;
+}
+
+.search-box {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+}
+.search-box input {
+  width: 100%;
+  padding: 14px 44px 14px 46px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--on-surface);
+  background: var(--container);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-m);
+  outline: none;
+  transition: all .25s var(--ease);
+}
+.search-box input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent);
+}
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: .5;
+  pointer-events: none;
+}
+.clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: 0;
+  color: var(--on-variant);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.filter-group-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--on-variant);
+  margin-bottom: 8px;
+}
+
+.chips-row { display: flex; flex-direction: column; gap: 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; }
+.chip {
+  font: 500 13.5px/1 'Roboto Flex', sans-serif; 
+  cursor: pointer;
+  padding: 10px 16px; 
+  border-radius: var(--radius-s);
+  border: 1px solid var(--outline); 
+  background: transparent; 
+  color: var(--on-surface);
+  transition: all .25s var(--ease-smooth);
+}
+.chip:hover { background: var(--container); }
+.chip[aria-pressed="true"] {
+  background: color-mix(in oklab, var(--accent) 25%, var(--container));
+  border-color: var(--accent);
+}
+
+/* Секции списка */
+.group { margin: 0 0 80px; }
+.group[hidden] { display: none; }
+.group-head {
+  display: flex; 
+  align-items: baseline; 
+  gap: 16px; 
+  flex-wrap: wrap;
+  padding-bottom: 16px; 
+  margin-bottom: 36px;
+  border-bottom: 1px solid color-mix(in oklab, var(--outline) 60%, transparent);
+}
+.group-head h2 {
+  font-family: 'Unbounded', sans-serif; 
+  font-weight: 600; 
+  font-size: clamp(22px, 3.2vw, 30px);
+  margin: 0; 
+  letter-spacing: -.01em;
+}
+.group-count { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--on-variant); }
+.group-note { flex-basis: 100%; margin: 8px 0 0; color: var(--on-variant); font-size: 15px; max-width: 64ch; }
+
+/* Карточка человека */
+.person {
+  display: grid; 
+  grid-template-columns: 200px 1fr; 
+  gap: 32px; 
+  align-items: start;
+  margin: 0 0 28px; 
+  padding: 26px; 
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--pc) 6%, var(--container));
+  border: 1px solid color-mix(in oklab, var(--pc) 15%, transparent);
+  cursor: pointer;
+  opacity: 0; 
+  transform: translateY(24px);
+  transition: opacity .6s var(--ease-smooth), transform .6s var(--ease-bounce), box-shadow .3s var(--ease-smooth), background .3s var(--ease);
+}
+.person.in { opacity: 1; transform: none; }
+.person:hover {
+  transform: translateY(-5px) scale(1.002);
+  box-shadow: 0 20px 40px -15px color-mix(in oklab, var(--pc) 30%, transparent);
+  background: color-mix(in oklab, var(--pc) 10%, var(--container));
+}
+.person.flip { grid-template-columns: 1fr 200px; }
+.person.flip .portrait { order: 2; }
+
+.portrait {
+  position: relative; 
+  width: 100%; 
+  aspect-ratio: 1/1.1; 
+  border-radius: var(--radius-l);
+  overflow: hidden; 
+  background: linear-gradient(150deg, color-mix(in oklab, var(--pc) 55%, #000) 0%, color-mix(in oklab, var(--pc) 18%, var(--container-high)) 100%);
+  display: grid; 
+  place-items: center;
+}
+.portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.portrait .initials {
+  position: absolute; 
+  font-family: 'Unbounded', sans-serif; 
+  font-weight: 600; 
+  font-size: 40px;
+  color: color-mix(in oklab, var(--pc) 75%, #fff); 
+  letter-spacing: .02em;
+}
+
+.meta {
+  font-family: 'JetBrains Mono', monospace; 
+  font-size: 12px; 
+  letter-spacing: .08em;
+  text-transform: uppercase; 
+  color: var(--pc); 
+  margin: 2px 0 8px; 
+  filter: saturate(1.2);
+}
+.person h3 {
+  font-family: 'Unbounded', sans-serif; 
+  font-weight: 600; 
+  font-size: clamp(19px, 2.3vw, 25px);
+  margin: 0 0 10px; 
+  letter-spacing: -.01em; 
+  line-height: 1.2;
+}
+.person p.text { margin: 0 0 18px; color: var(--on-variant); max-width: 62ch; font-size: 15px; }
+
+.card-footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.record {
+  display: inline-block; 
+  font-family: 'JetBrains Mono', monospace; 
+  font-size: 12px;
+  padding: 6px 12px; 
+  border-radius: var(--radius-s); 
+  margin: 0;
+  background: color-mix(in oklab, var(--pc) 16%, var(--container-high));
+  color: var(--on-surface);
+}
+.card-actions { display: flex; gap: 8px; }
+.btn-more {
+  background: transparent;
+  border: 1px solid color-mix(in oklab, var(--pc) 40%, transparent);
+  color: var(--on-surface);
+  font-family: inherit;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  transition: all .2s var(--ease);
+}
+.person:hover .btn-more {
+  background: var(--pc);
+  border-color: var(--pc);
+  color: #fff;
+}
+.btn-icon-share {
+  background: transparent;
+  border: 1px solid var(--outline);
+  color: var(--on-surface);
+  padding: 6px 10px;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background .2s var(--ease);
+}
+.btn-icon-share:hover { background: var(--container-high); }
+
+/* Модальное окно */
+dialog.modal {
+  border: 1px solid color-mix(in oklab, var(--outline) 80%, transparent);
+  border-radius: var(--radius-xl);
+  padding: 0;
+  max-width: 760px;
+  width: 92vw;
+  background: var(--container);
+  color: var(--on-surface);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.6);
+  overflow: hidden;
+  opacity: 0;
+  transform: scale(0.96) translateY(12px);
+  transition: opacity .3s var(--ease-smooth), transform .3s var(--ease-bounce), overlay .3s allow-discrete, display .3s allow-discrete;
+}
+dialog.modal[open] {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+@starting-style {
+  dialog.modal[open] {
+    opacity: 0;
+    transform: scale(0.96) translateY(12px);
+  }
+}
+dialog.modal::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity .3s var(--ease-smooth);
+}
+dialog.modal[open]::backdrop { opacity: 1; }
+
+.modal-content { padding: 36px; max-height: 85vh; overflow-y: auto; position: relative; }
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  border: 0;
+  background: var(--container-high);
+  color: var(--on-surface);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background .2s var(--ease);
+}
+.modal-close:hover { background: var(--outline); }
+
+.modal-header {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+.modal-portrait {
+  width: 120px;
+  height: 135px;
+  flex-shrink: 0;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  background: var(--container-high);
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+.modal-portrait img { width: 100%; height: 100%; object-fit: cover; }
+.modal-portrait .initials { font-family: 'Unbounded', sans-serif; font-size: 32px; color: var(--pc); }
+
+.modal-title-group h2 {
+  font-family: 'Unbounded', sans-serif;
+  font-size: clamp(22px, 3vw, 28px);
+  margin: 4px 0 10px;
+}
+
+.modal-quote {
+  margin: 0 0 28px;
+  padding: 16px 20px;
+  border-left: 4px solid var(--pc);
+  background: color-mix(in oklab, var(--pc) 8%, var(--surface-dim));
+  border-radius: 0 var(--radius-m) var(--radius-m) 0;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--on-surface);
+}
+
+.modal-bio { font-size: 16px; line-height: 1.7; color: var(--on-variant); margin-bottom: 32px; }
+.modal-bio p { margin: 0 0 16px; }
+
+.modal-section { margin-bottom: 32px; }
+.modal-section h3 {
+  font-family: 'Unbounded', sans-serif;
+  font-size: 17px;
+  margin: 0 0 16px;
+  letter-spacing: -.01em;
+}
+
+/* Хронология */
+.timeline {
+  position: relative;
+  padding-left: 20px;
+  border-left: 2px solid color-mix(in oklab, var(--pc) 40%, var(--outline));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.timeline-item { position: relative; }
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -27px;
+  top: 6px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--pc);
+}
+.timeline-year { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; font-weight: 600; color: var(--pc); }
+.timeline-text { font-size: 14.5px; color: var(--on-surface); }
+
+/* Ссылки в модальном окне */
+.modal-links { display: flex; flex-wrap: wrap; gap: 10px; }
+.modal-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-s);
+  background: var(--container-high);
+  color: var(--on-surface);
+  text-decoration: none;
+  font-size: 13.5px;
+  border: 1px solid color-mix(in oklab, var(--outline) 60%, transparent);
+  transition: all .2s var(--ease);
+}
+.modal-link-btn:hover {
+  background: color-mix(in oklab, var(--pc) 20%, var(--container-high));
+  border-color: var(--pc);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in oklab, var(--outline) 40%, transparent);
+}
+
+/* Кнопка Наверх */
+.back-to-top {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 90;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--container-high);
+  color: var(--on-surface);
+  border: 1px solid var(--outline);
+  font-size: 20px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all .3s var(--ease-smooth);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+.back-to-top.show {
+  opacity: 1;
+  visibility: visible;
+}
+.back-to-top:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  transform: translateY(-3px);
+}
+
+/* Toast всплывашка */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  z-index: 100;
+  padding: 12px 20px;
+  background: var(--container-high);
+  color: var(--on-surface);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-m);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: opacity .3s var(--ease-smooth), transform .3s var(--ease-bounce);
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+
+.empty-state {
+  text-align: center;
+  padding: 64px 20px;
+  color: var(--on-variant);
+  font-size: 18px;
+}
+
+/* Подвал */
+footer {
+  border-top: 1px solid color-mix(in oklab, var(--outline) 60%, transparent);
+  padding: 48px 0 80px; 
+  color: var(--on-variant); 
+  font-size: 14px;
+}
+footer h4 { font-family: 'Unbounded', sans-serif; font-weight: 400; font-size: 15px; margin: 0 0 12px; color: var(--on-surface); }
+footer a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+footer a:hover { border-bottom-color: currentColor; }
+footer p { max-width: 66ch; margin: 0 0 14px; }
+
+@media (max-width: 760px) {
+  body { font-size: 16px; }
+  .hero { padding: 40px 0 24px; }
+  .person, .person.flip { grid-template-columns: 1fr; gap: 20px; padding: 20px; }
+  .person.flip .portrait { order: 0; }
+  .portrait { width: 100%; max-width: 200px; }
+  .modal-header { flex-direction: column; }
+  .modal-portrait { width: 90px; height: 100px; }
+  .namewall { padding: 18px; line-height: 2.3; }
+  .back-to-top { bottom: 20px; right: 20px; width: 42px; height: 42px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+  html { scroll-behavior: auto; }
+  .person { opacity: 1; transform: none; }
 }
 </style>
 </head>
@@ -215,273 +628,1138 @@ footer p{max-width:66ch; margin:0 0 14px}
 
 <div class="wrap">
   <section class="hero">
-    <p class="eyebrow">Россия · последние тридцать лет</p>
+    <p class="eyebrow">Россия · советский период и современность</p>
     <h1>Список тех, кто не согласился</h1>
-    <p class="lede">Политики, журналисты, правозащитники и обычные люди, которые вслух назвали вещи своими именами. <b>Кого-то за это убили, кто-то сидит прямо сейчас, кто-то продолжает работать из-за границы.</b></p>
+    <p class="lede">Политики, журналисты, правозащитники, деятели культуры и науки, которые публично выступили против репрессий и произвола. <b>50 историй личного мужества и гражданского выбора.</b></p>
 
     <nav class="namewall" id="namewall" aria-label="Все имена"></nav>
-    <p class="wall-key"><s>Зачёркнуты</s> — те, кого убили или кто умер под стражей. Наведите на имя, чтобы увидеть его цвет; нажмите, чтобы перейти к карточке.</p>
+    <p class="wall-key"><s>Зачёркнуты</s> — те, кого убили или кто умер под стражей. Нажмите на имя, чтобы открыть подробности.</p>
 
-    <div class="chips" id="chips" role="group" aria-label="Фильтр по разделам"></div>
+    <div class="controls-bar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="search" id="searchInput" placeholder="Поиск по имени, роли, биографии..." aria-label="Поиск">
+        <button id="clearSearch" class="clear-btn" hidden aria-label="Очистить поиск">&times;</button>
+      </div>
+
+      <div class="chips-row">
+        <div>
+          <div class="filter-group-label">Статус / Раздел</div>
+          <div class="chips" id="statusChips" role="group" aria-label="Фильтр по статусу"></div>
+        </div>
+        <div>
+          <div class="filter-group-label">Сфера деятельности</div>
+          <div class="chips" id="sphereChips" role="group" aria-label="Фильтр по сфере"></div>
+        </div>
+      </div>
+    </div>
   </section>
 
   <main id="list"></main>
 
+  <div id="emptyState" class="empty-state" hidden>
+    Ничего не найдено по вашему запросу.
+  </div>
+
   <footer>
     <h4>Об источниках</h4>
-    <p>Биографические справки собраны по открытым источникам. Сведения о приговорах и сроках меняются: перед публикацией сверьтесь со списками правозащитного центра «Мемориал» (<a href="https://memopzk.org" target="_blank" rel="noopener">memopzk.org</a>) и <a href="https://ovd.info" target="_blank" rel="noopener">ОВД-Инфо</a>.</p>
-    <p>Данные в файле приведены по состоянию на июль 2026 года. Фотографии не включены — добавьте ссылки в поле <code>photo</code>, используя изображения со свободной лицензией (например, Wikimedia Commons).</p>
+    <p>Сведения собраны по открытым источникам, материалам правозащитного центра «Мемориал» (<a href="https://memopzk.org" target="_blank" rel="noopener">memopzk.org</a>) и <a href="https://ovd.info" target="_blank" rel="noopener">ОВД-Инфо</a>.</p>
+    <p>Данные актуализированы по состоянию на 2026 год.</p>
   </footer>
 </div>
 
+<!-- Модальное окно -->
+<dialog id="modal" class="modal">
+  <div class="modal-content">
+    <button class="modal-close" id="modalClose" aria-label="Закрыть">&times;</button>
+    <div class="modal-header">
+      <div class="modal-portrait" id="modalPortrait"></div>
+      <div class="modal-title-group">
+        <p class="meta" id="modalMeta"></p>
+        <h2 id="modalName"></h2>
+        <span class="record" id="modalRecord"></span>
+      </div>
+    </div>
+    <div class="modal-body">
+      <blockquote id="modalQuote" class="modal-quote"></blockquote>
+      <div id="modalBio" class="modal-bio"></div>
+      
+      <div class="modal-section" id="modalTimelineSec">
+        <h3>Хронология и вехи</h3>
+        <div class="timeline" id="modalTimeline"></div>
+      </div>
+      
+      <div class="modal-section" id="modalLinksSec">
+        <h3>Материалы и ссылки</h3>
+        <div class="modal-links" id="modalLinks"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-more" id="modalShareBtn">🔗 Скопировать ссылку</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Кнопка Наверх -->
+<button id="backToTop" class="back-to-top" aria-label="Вернуться наверх">↑</button>
+
+<!-- Toast всплывашка -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
 <script>
-/* ═══════════════════════════════════════════════════════════
-   ДАННЫЕ. Чтобы добавить человека — скопируйте любой объект.
-   group: dissidents | killed | prison | exile
-   accent: личный цвет (влияет на цвет всей страницы при скролле)
-   photo: URL фотографии; пусто — покажутся инициалы
-   ═══════════════════════════════════════════════════════════ */
 const PEOPLE = [
-/* ── ДИССИДЕНТЫ ──────────────────────────────────────────── */
-{group:"dissidents",name:"Андрей Сахаров",years:"1921 — 1989",role:"Физик, правозащитник",accent:"#FFD54F",photo:"",
- text:"Создатель водородной бомбы, ставший главным голосом совести советской эпохи. Автор «Размышлений о прогрессе, мирном сосуществовании и интеллектуальной свободе». За протест против войны в Афганистане отправлен в ссылку в Горький.",
- record:"Ссылка в Горький · 1980–1986 · Нобелевская премия мира 1975"},
-{group:"dissidents",name:"Владимир Буковский",years:"1942 — 2019",role:"Диссидент, писатель",accent:"#90A4AE",photo:"",
- text:"Двенадцать лет в тюрьмах, лагерях и спецпсихбольницах. Сумел передать на Запад документы, доказавшие, что психиатрию в СССР использовали как наказание за инакомыслие.",
- record:"12 лет заключения · обменян в 1976 году"},
-{group:"dissidents",name:"Наталья Горбаневская",years:"1936 — 2013",role:"Поэт, редактор",accent:"#CE93D8",photo:"",
- text:"Одна из семерых, вышедших 25 августа 1968 года на Красную площадь против ввода войск в Чехословакию. Основала «Хронику текущих событий» — самиздатский бюллетень о политических преследованиях.",
- record:"Спецпсихбольница · 1969–1972"},
-{group:"dissidents",name:"Сергей Ковалёв",years:"1930 — 2021",role:"Биолог, правозащитник",accent:"#A1887F",photo:"",
- text:"Прошёл лагеря и ссылку за участие в правозащитном движении. Стал первым уполномоченным по правам человека в России и потерял этот пост, когда открыто выступил против войны в Чечне.",
- record:"7 лет лагерей и 3 года ссылки · 1974"},
-{group:"dissidents",name:"Людмила Алексеева",years:"1927 — 2018",role:"Историк, правозащитница",accent:"#81C784",photo:"",
- text:"Одна из основательниц Московской Хельсинкской группы — старейшей правозащитной организации страны. После эмиграции вернулась в Россию и до последних лет выходила на пикеты в защиту заключённых.",
- record:"МХГ · с 1976 года"},
+/* ── СОВЕТСКИЕ ДИССИДЕНТЫ ────────────────────────────────── */
+{
+  group: "dissidents", sphere: "science", name: "Андрей Сахаров", years: "1921 — 1989", role: "Физик, правозащитник", accent: "#FFD54F", photo: "",
+  text: "Создатель водородной бомбы, ставший главным голосом совести советской эпохи. Автор манифеста об интеллектуальной свободе.",
+  fullBio: "Андрей Сахаров — советский физик-теоретик, один из создателей водородной бомбы. Впоследствии осознал гибельность ядерного оружия и стал ключевой фигурой диссидентского движения.\n\nЗа протесты против ввода советских войск в Афганистан был без суда сослан в Горький.",
+  quote: "Свобода мысли — единственная гарантия от заражения народа массовыми мифами.",
+  timeline: [
+    { year: "1975", text: "Присуждение Нобелевской премии мира." },
+    { year: "1980", text: "Ссылка в закрытый город Горький." },
+    { year: "1986", text: "Возвращение из ссылки по решению Горбачёва." }
+  ],
+  links: [{ title: "Центр Сахарова", url: "https://www.sakharov-center.ru" }],
+  record: "Ссылка в Горький · Нобелевская премия мира 1975"
+},
+{
+  group: "dissidents", sphere: "rights", name: "Владимир Буковский", years: "1942 — 2019", role: "Диссидент, писатель", accent: "#90A4AE", photo: "",
+  text: "Двенадцать лет в тюрьмах, лагерях и спецпсихбольницах. Разоблачил использование психиатрии в репрессивных целях.",
+  fullBio: "Владимир Буковский — один из самых бескомпромиссных деятелей диссидентского движения. Передал на Запад 150 страниц документов о карательной психиатрии в СССР.",
+  quote: "Если двое борются, а остальные смотрят, это не борьба. Это шоу.",
+  timeline: [
+    { year: "1971", text: "Передача на Запад документов о репрессивной психиатрии." },
+    { year: "1976", text: "Обмен в Женеве на лидера КП Чили Луиса Корвалана." }
+  ],
+  links: [],
+  record: "12 лет заключения · Обменяна в 1976 году"
+},
+{
+  group: "dissidents", sphere: "culture", name: "Наталья Горбаневская", years: "1936 — 2013", role: "Поэт, переводчик", accent: "#CE93D8", photo: "",
+  text: "Участница демонстрации на Красной площади 25 августа 1968 года против ввода войск в Чехословакию.",
+  fullBio: "Наталья Горбаневская — поэтесса, основательница самиздатского бюллетеня «Хроника текущих событий». Была одной из семерых человек, вышедших на Лобное место с плакатом «За вашу и нашу свободу».",
+  quote: "За вашу и нашу свободу!",
+  timeline: [
+    { year: "1968", text: "Демонстрация на Красной площади против оккупации Чехословакии." },
+    { year: "1970", text: "Принудительное лечение в Казанской спецпсихбольнице." }
+  ],
+  links: [],
+  record: "Спецпсихбольница · 1969–1972"
+},
+{
+  group: "dissidents", sphere: "science", name: "Сергей Ковалёв", years: "1930 — 2021", role: "Биолог, правозащитник", accent: "#A1887F", photo: "",
+  text: "Первый уполномоченный по правам человека в РФ. Открыто выступил против первой Чеченской войны.",
+  fullBio: "Сергей Ковалёв — советский диссидент и российский политик. В 1994–1995 годах лично находился в Грозном во время штурма, спасая жизни мирных жителей и пленных солдат.",
+  quote: "Вектор развития страны задается честностью её граждан.",
+  timeline: [
+    { year: "1974", text: "Арест за участие в «Хронике текущих событий» (7 лет лагерей)." },
+    { year: "1994", text: "Миссия правозащитника в осаждённом Грозном." }
+  ],
+  links: [],
+  record: "7 лет лагерей и 3 года ссылки"
+},
+{
+  group: "dissidents", sphere: "rights", name: "Людмила Алексеева", years: "1927 — 2018", role: "Историк, правозащитница", accent: "#81C784", photo: "",
+  text: "Основательница Московской Хельсинкской группы. До последних лет отстаивала права заключенных.",
+  fullBio: "Людмила Алексеева — старейшая российская правозащитница. В 1976 году стала одним из сооснователей МХГ, вела систематический мониторинг нарушений прав человека.",
+  quote: "Правозащита — это не политика, это защита человеческого достоинства.",
+  timeline: [
+    { year: "1976", text: "Создание Московской Хельсинкской группы." },
+    { year: "2009", text: "Участие в акциях «Стратегии-31» на Триумфальной площади." }
+  ],
+  links: [{ title: "МХГ", url: "https://mhg.ru" }],
+  record: "Председатель МХГ с 1996 года"
+},
+{
+  group: "dissidents", sphere: "politics", name: "Валерия Новодворская", years: "1950 — 2014", role: "Диссидент, политик", accent: "#E57373", photo: "",
+  text: "Основательница «Демократического союза». Провела годы в спецпсихбольницах за раздачу листовок.",
+  fullBio: "Валерия Новодворская — советская диссидентка и публицист. В 19 лет была арестована в Дворце съездов за раздачу антисоветских стихотворений.",
+  quote: "Свобода — это категория не материальная, а духовная.",
+  timeline: [
+    { year: "1969", text: "Арест за листовки в Кремлевском дворце." },
+    { year: "1988", text: "Создание партии «Демократический союз»." }
+  ],
+  links: [],
+  record: "Принудительное лечение в Казани"
+},
+{
+  group: "dissidents", sphere: "rights", name: "Натан Щаранский", years: "1948", role: "Правозащитник, государственный деятель", accent: "#64B5F6", photo: "",
+  text: "Один из лидеров движения советских евреев за право на выезд. Провел 9 лет в советских лагерях.",
+  fullBio: "Натан (Анатолий) Щаранский — правозащитник, отказавшийся сотрудничать с КГБ. На суде произнес знаменитую речь «Ответственность перед совестью».",
+  quote: "Ам Израэль Хай! И суду мне сказать нечего.",
+  timeline: [
+    { year: "1977", text: "Арест по обвинению в измене родине и шпионаже." },
+    { year: "1986", text: "Освобождение на мосту Глинике в Берлине." }
+  ],
+  links: [],
+  record: "9 лет заключения · Обменен в 1986"
+},
+{
+  group: "dissidents", sphere: "culture", name: "Александр Солженицын", years: "1918 — 2008", role: "Писатель, лауреат Нобелевской премии", accent: "#DCE775", photo: "",
+  text: "Автор «Архипелага ГУЛАГ», высланный из СССР за правду о сталинских лагерях.",
+  fullBio: "Александр Солженицын — писатель, пробывший 8 лет в лагерях и ссылке. Его эпопея «Архипелаг ГУЛАГ» стала главным документом, разоблачившим систему советских репрессий.",
+  quote: "Жить не по лжи!",
+  timeline: [
+    { year: "1970", text: "Присуждение Нобелевской премии по литературе." },
+    { year: "1974", text: "Лишение гражданства и насильственная высылка из СССР." }
+  ],
+  links: [],
+  record: "Лишение гражданства · Высылка в 1974"
+},
+{
+  group: "dissidents", sphere: "science", name: "Юрий Орлов", years: "1924 — 2020", role: "Физик, правозащитник", accent: "#4DB6AC", photo: "",
+  text: "Основатель Московской Хельсинкской группы. Физик-ядерщик, лишённый всех званий за правозащиту.",
+  fullBio: "Юрий Орлов — советский физик, профессор. В 1976 году инициатор создания МХГ для контроля за выполнением Хельсинкских соглашений.",
+  quote: "Человек должен отстаивать свои права сам и помогать другим.",
+  timeline: [
+    { year: "1976", text: "Основание Московской Хельсинкской группы." },
+    { year: "1986", text: "Лишение гражданства и высылка в США." }
+  ],
+  links: [],
+  record: "7 лет лагерей и 5 лет ссылки"
+},
+{
+  group: "dissidents", sphere: "journalism", name: "Александр Гинзбург", years: "1936 — 2002", role: "Журналист, издатель", accent: "#FF8A65", photo: "",
+  text: "Составитель первого самиздатского журнала «Синтаксис». Распорядитель фонда помощи политзаключенным.",
+  fullBio: "Александр Гинзбург — журналист, трижды осужденный в СССР за свою независимую издательскую деятельность и помощь семьям политзаключенных.",
+  quote: "Помощь гонимым — обязанность каждого честного человека.",
+  timeline: [
+    { year: "1959", text: "Создание поэтического альманаха «Синтаксис»." },
+    { year: "1979", text: "Обмен пяти советских политзаключенных на советских разведчиков." }
+  ],
+  links: [],
+  record: "3 срока общей сложностью 12 лет"
+},
 
 /* ── УБИТЫ И ПОГИБЛИ ─────────────────────────────────────── */
-{group:"killed",name:"Алексей Навальный",years:"1976 — 2024",role:"Юрист, основатель ФБК",accent:"#E53935",photo:"",
- text:"Превратил антикоррупционные расследования в массовую политику: фильмы о собственности чиновников собирали десятки миллионов просмотров. В 2020 году отравлен «Новичком», выжил, вернулся в Россию и был задержан прямо в аэропорту.",
- record:"19 лет по совокупности · умер в ИК-3 «Полярный волк», Харп"},
-{group:"killed",name:"Борис Немцов",years:"1959 — 2015",role:"Политик, вице-премьер",accent:"#4FC3F7",photo:"",
- text:"Губернатор и вице-премьер в девяностые, затем один из лидеров оппозиции. Выпускал доклады «Путин. Итоги» и «Путин. Война». Убит четырьмя выстрелами в спину в двухстах метрах от Кремля.",
- record:"Большой Москворецкий мост · 27 февраля 2015"},
-{group:"killed",name:"Анна Политковская",years:"1958 — 2006",role:"Журналистка «Новой газеты»",accent:"#B39DDB",photo:"",
- text:"Годами ездила в Чечню и писала о пытках, похищениях и внесудебных казнях, когда об этом почти никто не писал. Застрелена в лифте собственного дома.",
- record:"Убита 7 октября 2006 года"},
-{group:"killed",name:"Наталья Эстемирова",years:"1958 — 2009",role:"Сотрудница «Мемориала»",accent:"#26A69A",photo:"",
- text:"Документировала похищения людей и карательные поджоги домов в Чечне — то, о чём в республике боялись говорить вслух. Похищена у собственного подъезда в Грозном и убита в тот же день.",
- record:"Похищена и убита 15 июля 2009 года"},
-{group:"killed",name:"Станислав Маркелов",years:"1974 — 2009",role:"Адвокат",accent:"#FF8A65",photo:"",
- text:"Защищал жертв пыток в Чечне и семьи убитых, вёл дела о нападениях неонацистов. Убит средь бела дня в центре Москвы, когда шёл с пресс-конференции.",
- record:"Убит 19 января 2009 года"},
-{group:"killed",name:"Анастасия Бабурова",years:"1983 — 2009",role:"Журналистка",accent:"#FFAB91",photo:"",
- text:"Писала о неонацистском подполье для «Новой газеты». Смертельно ранена, когда попыталась остановить человека, застрелившего адвоката Маркелова.",
- record:"Убита 19 января 2009 года"},
-{group:"killed",name:"Галина Старовойтова",years:"1946 — 1998",role:"Депутат, этнограф",accent:"#F06292",photo:"",
- text:"Одна из основательниц демократического движения, добивалась люстрации сотрудников КГБ. Убита в подъезде своего дома в Петербурге.",
- record:"Убита 20 ноября 1998 года"},
-{group:"killed",name:"Юрий Щекочихин",years:"1950 — 2003",role:"Журналист, депутат Госдумы",accent:"#B0BEC5",photo:"",
- text:"Расследовал коррупционные схемы на стыке спецслужб и бизнеса, в том числе дело «Трёх китов». Умер за две недели от стремительной болезни с симптомами отравления; медицинские документы семье не выдали.",
- record:"Умер 3 июля 2003 года"},
-{group:"killed",name:"Сергей Магнитский",years:"1972 — 2009",role:"Юрист, аудитор",accent:"#FFB74D",photo:"",
- text:"Вскрыл схему хищения 5,4 млрд рублей из российского бюджета — и был арестован по обвинению, которое сам же расследовал. Умер в СИЗО, не получив медицинской помощи. Его именем назван закон о персональных санкциях.",
- record:"Умер в СИЗО «Матросская тишина» · 16 ноября 2009"},
+{
+  group: "killed", sphere: "politics", name: "Алексей Навальный", years: "1976 — 2024", role: "Юрист, основатель ФБК", accent: "#E53935", photo: "",
+  text: "Главный оппонент российской власти, превративший антикоррупционные расследования в массовую политику.",
+  fullBio: "Алексей Навальный — основатель ФБК. Пережил отравление «Новичком» в 2020 году, вернулся в РФ и был арестован в аэропорту. Погиб в колонии «Полярный волк».",
+  quote: "Не сдавайтесь. Если это произошло, это означает, что мы необычайно сильны.",
+  timeline: [
+    { year: "2011", text: "Основание Фонда борьбы с коррупцией." },
+    { year: "2020", text: "Отравление в Томске и лечение в Charité." },
+    { year: "2024", text: "Гибель в ИК-3 в посёлке Харп." }
+  ],
+  links: [{ title: "ФБК", url: "https://acf.international" }],
+  record: "19 лет колонии · Погиб в ИК-3"
+},
+{
+  group: "killed", sphere: "politics", name: "Борис Немцов", years: "1959 — 2015", role: "Политик, вице-премьер", accent: "#4FC3F7", photo: "",
+  text: "Бывший вице-премьер, ставший лидером оппозиции. Убит на Большом Москворецком мосту.",
+  fullBio: "Борис Немцов — губернатор Нижегородской области, вице-премьер РФ. В 2000-е годы — автор серии докладов о коррупции («Путин. Итоги»). Застрелен около Кремля.",
+  quote: "Россия будет свободной.",
+  timeline: [
+    { year: "1997", text: "Первый заместитель председателя правительства РФ." },
+    { year: "2015", text: "Убийство в центре Москвы 27 февраля." }
+  ],
+  links: [],
+  record: "Убит 27 февраля 2015 года"
+},
+{
+  group: "killed", sphere: "journalism", name: "Анна Политковская", years: "1958 — 2006", role: "Журналистка «Новой газеты»", accent: "#B39DDB", photo: "",
+  text: "Писала о войнах и военных преступлениях в Чечне. Застрелена в лифте своего дома.",
+  fullBio: "Анна Политковская — специальный корреспондент «Новой газеты». Документировала нарушения прав человека на Кавказе. Погибла от рук киллера.",
+  quote: "Я описываю жизнь тех, кто не может за себя заступиться.",
+  timeline: [
+    { year: "2002", text: "Участие в переговорах с террористами на Дубровке." },
+    { year: "2006", text: "Убийство в подъезде своего дома 7 октября." }
+  ],
+  links: [],
+  record: "Убита 7 октября 2006 года"
+},
+{
+  group: "killed", sphere: "rights", name: "Наталья Эстемирова", years: "1958 — 2009", role: "Сотрудница «Мемориала»", accent: "#26A69A", photo: "",
+  text: "Фиксировала похищения людей и пытки в Чечне. Похищена и убита в 2009 году.",
+  fullBio: "Наталья Эстемирова — правозащитница, собирала свидетельства внесудебных казней и поджогов домов в Чечне. Была похищена в Грозном.",
+  quote: "Правду о происходящем скрывать нельзя.",
+  timeline: [
+    { year: "2007", text: "Награждена премией имени Анны Политковской." },
+    { year: "2009", text: "Похищение в Грозном и убийство 15 июля." }
+  ],
+  links: [],
+  record: "Убита 15 июля 2009 года"
+},
+{
+  group: "killed", sphere: "rights", name: "Станислав Маркелов", years: "1974 — 2009", role: "Адвокат, правозащитник", accent: "#FF8A65", photo: "",
+  text: "Защищал жертв пыток и неонацистского насилия. Убит в центре Москвы.",
+  fullBio: "Станислав Маркелов — адвокат, ведавший делами пострадавших мирных жителей Чечни и антифашистов. Застрелен неонацистами из группировки БОРН.",
+  quote: "Защита человеческой жизни — выше любых политических амбиций.",
+  timeline: [
+    { year: "2008", text: "Защита интересов семьи Эльзы Кунгаевой." },
+    { year: "2009", text: "Убийство на Пречистенке 19 января." }
+  ],
+  links: [],
+  record: "Убит 19 января 2009 года"
+},
+{
+  group: "killed", sphere: "journalism", name: "Анастасия Бабурова", years: "1983 — 2009", role: "Журналистка", accent: "#FFAB91", photo: "",
+  text: "Журналистка «Новой газеты», погибшая при попытке остановить убийцу адвоката Маркелова.",
+  fullBio: "Анастасия Бабурова — студентка МГУ, внештатный корреспондент «Новой газеты». Занималась расследованиями деятельности ультраправых группировок.",
+  quote: "Моя профессия — говорить о том, о чем пытаются молчать.",
+  timeline: [
+    { year: "2009", text: "Убита 19 января вместе со Станиславом Маркеловым." }
+  ],
+  links: [],
+  record: "Убита 19 января 2009 года"
+},
+{
+  group: "killed", sphere: "politics", name: "Галина Старовойтова", years: "1946 — 1998", role: "Депутат Госдумы", accent: "#F06292", photo: "",
+  text: "Соратница Сахарова, добивавшаяся люстрации сотрудников КГБ. Застрелена в Петербурге.",
+  fullBio: "Галина Старовойтова — этнограф, советник президента Ельцина. Добивалась открытости архивов и проведения люстрации. Застрелена в подъезде дома.",
+  quote: "Без очищения власти от прошлого у страны нет будущего.",
+  timeline: [
+    { year: "1992", text: "Внесение законопроекта о люстрациях." },
+    { year: "1998", text: "Убийство в Санкт-Петербурге 20 ноября." }
+  ],
+  links: [],
+  record: "Убита 20 ноября 1998 года"
+},
+{
+  group: "killed", sphere: "journalism", name: "Юрий Щекочихин", years: "1950 — 2003", role: "Журналист, депутат", accent: "#B0BEC5", photo: "",
+  text: "Расследовал коррупцию в спецслужбах. Скоропостижно скончался от симптомов отравления.",
+  fullBio: "Юрий Щекочихин — заместитель главного редактора «Новой газеты», депутат Госдумы. Вел расследование громкого дела о контрабанде «Три кита».",
+  quote: "Власть не должна чувствовать себя безнаказанной.",
+  timeline: [
+    { year: "2000", text: "Зампред комитета Госдумы по безопасности." },
+    { year: "2003", text: "Загадочная смерть в больнице 3 июля." }
+  ],
+  links: [],
+  record: "Скоропостижно умер 3 июля 2003 года"
+},
+{
+  group: "killed", sphere: "rights", name: "Сергей Магнитский", years: "1972 — 2009", role: "Аудитор", accent: "#FFB74D", photo: "",
+  text: "Вскрыл хищение 5,4 млрд рублей силовиками. Погиб в СИЗО без медицинской помощи.",
+  fullBio: "Сергей Магнитский — аудитор, разоблачивший схему незаконного возврата налогов силовиками. Был арестован теми же сотрудниками и умер в «Матросской тишине».",
+  quote: "Меня держат в заложниках, потому что я назвал имена воров.",
+  timeline: [
+    { year: "2008", text: "Дача показаний против сотрудников МВД и арест." },
+    { year: "2009", text: "Гибель в СИЗО 16 ноября." }
+  ],
+  links: [],
+  record: "Умер в СИЗО 16 ноября 2009 года"
+},
+{
+  group: "killed", sphere: "politics", name: "Александр Литвиненко", years: "1962 — 2006", role: "Офицер спецслужб, публицист", accent: "#80CBC4", photo: "",
+  text: "Бывший подполковник ФСБ, открыто заявивший о преступных указаниях руководства. Отравлен полонием.",
+  fullBio: "Александр Литвиненко — офицер спецслужб, выступивший в 1998 году на пресс-конференции с заявлением о получении приказа убить Бориса Березовского. Отравлен в Лондоне полонием-210.",
+  quote: "Правду о взрывах домов в России не скрыть.",
+  timeline: [
+    { year: "1998", text: "Пресс-конференция офицеров ФСБ." },
+    { year: "2006", text: "Отравление радиоактивным полонием 1 ноября." }
+  ],
+  links: [],
+  record: "Отравлен в Лондоне в 2006 году"
+},
+{
+  group: "killed", sphere: "politics", name: "Денис Вороненков", years: "1971 — 2017", role: "Экс-депутат Госдумы", accent: "#A1887F", photo: "",
+  text: "Давал показания по делу о госизмене Януковича. Застрелен в центре Киева.",
+  fullBio: "Денис Вороненков — бывший депутат Госдумы, уехавший в Украину и дававший показания о событиях 2014 года. Убит киллером у отеля Premier Palace.",
+  quote: "Система не прощает тех, кто ломает её правила.",
+  timeline: [
+    { year: "2016", text: "Переезд в Украину и получение гражданства." },
+    { year: "2017", text: "Застрелен в Киеве 23 марта." }
+  ],
+  links: [],
+  record: "Убит 23 марта 2017 года"
+},
+{
+  group: "killed", sphere: "politics", name: "Сергей Юшенков", years: "1950 — 2003", role: "Политик, депутат", accent: "#90CAF9", photo: "",
+  text: "Один из лидеров партии «Либеральная Россия». Убит у собственного дома в Москве.",
+  fullBio: "Сергей Юшенков — депутат Госдумы, активно расследовавший обстоятельств взрывов жилых домов в РФ в 1999 году. Застрелен у подъезда своего дома.",
+  quote: "Демократия — это прежде всего процедура и закон.",
+  timeline: [
+    { year: "2002", text: "Сосоздатель Общественной комиссии по расследованию взрывов домов." },
+    { year: "2003", text: "Застрелен 17 апреля в Москве." }
+  ],
+  links: [],
+  record: "Убит 17 апреля 2003 года"
+},
 
 /* ── ЗА РЕШЁТКОЙ ─────────────────────────────────────────── */
-{group:"prison",name:"Алексей Горинов",years:"р. 1961",role:"Муниципальный депутат",accent:"#FF7043",photo:"",
- text:"Первый в стране человек, отправленный в колонию по статье о «фейках» об армии: на заседании совета депутатов он предложил почтить память погибших детей вместо конкурса рисунков. Уже в заключении получил второй приговор — за разговоры с сокамерниками.",
- record:"ст. 207.3 УК · 7 лет + 5 лет"},
-{group:"prison",name:"Иван Сафронов",years:"р. 1990",role:"Военный журналист",accent:"#64B5F6",photo:"",
- text:"Писал о военно-промышленном комплексе для «Коммерсанта» и «Ведомостей». Обвинён в госизмене за передачу сведений, которые до этого публиковались в открытых источниках. Отказался признать вину в обмен на сокращение срока.",
- record:"ст. 275 УК · 22 года строгого режима"},
-{group:"prison",name:"Юрий Дмитриев",years:"р. 1956",role:"Историк «Мемориала»",accent:"#A5D6A7",photo:"",
- text:"Нашёл в карельских лесах Сандармох — место расстрелов времён Большого террора — и установил имена тысяч убитых. Уголовные дела против него дважды разваливались в суде, но каждый раз возобновлялись.",
- record:"15 лет строгого режима"},
-{group:"prison",name:"Азат Мифтахов",years:"р. 1993",role:"Математик, аспирант МГУ",accent:"#4DD0E1",photo:"",
- text:"Отсидел шесть лет по делу о разбитом окне офиса «Единой России» — обвинение строилось на показаниях засекреченного свидетеля. В день освобождения задержан снова. Сообщал о пытках в колонии «Полярная сова».",
- record:"6 лет · затем ещё 4 года"},
-{group:"prison",name:"Мария Пономаренко",years:"р. 1979",role:"Журналистка",accent:"#F48FB1",photo:"",
- text:"Осуждена за пост о бомбардировке драматического театра в Мариуполе. В заключении против неё возбуждали новые дела, срок продлевался; сообщала о принудительной психиатрии.",
- record:"6 лет · новые приговоры уже в колонии"},
-{group:"prison",name:"Евгения Беркович",years:"р. 1985",role:"Режиссёр",accent:"#BA68C8",photo:"",
- text:"Поставила спектакль «Финист Ясный Сокол» — о женщинах, завербованных боевиками. Следствие сочло антитеррористическую пьесу пропагандой терроризма.",
- record:"ст. 205.2 УК · 6 лет"},
-{group:"prison",name:"Светлана Петрийчук",years:"р. 1980",role:"Драматург",accent:"#9575CD",photo:"",
- text:"Автор того же спектакля, получившего «Золотую маску». Приговорена по тому же делу и к тому же сроку, что и режиссёр.",
- record:"ст. 205.2 УК · 6 лет"},
-{group:"prison",name:"Лилия Чанышева",years:"р. 1982",role:"Координатор штаба в Уфе",accent:"#FFA726",photo:"",
- text:"Первая из региональных координаторов сети штабов Навального, кого отправили в колонию. Дело возбудили задним числом — за работу, которая на тот момент была законной.",
- record:"7 лет колонии"},
-{group:"prison",name:"Игорь Барышников",years:"р. 1959",role:"Пенсионер из Калининграда",accent:"#90CAF9",photo:"",
- text:"Осуждён за посты о событиях в Буче. Тяжело болен онкологией, суды раз за разом отказывают в освобождении по состоянию здоровья.",
- record:"7,5 лет колонии"},
-{group:"prison",name:"Михаил Кригер",years:"р. 1960",role:"Правозащитник",accent:"#80CBC4",photo:"",
- text:"Ветеран правозащитного движения, участник одиночных пикетов ещё с девяностых. Получил срок за резкий комментарий в фейсбуке.",
- record:"7 лет колонии"},
-{group:"prison",name:"Дмитрий Иванов",years:"р. 1999",role:"Студент мехмата МГУ",accent:"#7E9CFF",photo:"",
- text:"Вёл телеграм-канал «Протестный МГУ», где публиковал антивоенные материалы. Судебное заседание пришлось на его выпускной курс.",
- record:"8,5 лет колонии"},
-{group:"prison",name:"Антонина Фаворская",years:"р. 1990-е",role:"Журналистка SOTAvision",accent:"#EC407A",photo:"",
- text:"Снимала суды над Навальным и была одной из тех, кто вёл репортажи с его похорон. Осуждена за «участие в экстремистском сообществе» — то есть за журналистскую работу о ФБК.",
- record:"Дело журналистов · 5,5 лет"},
-{group:"prison",name:"Артём Кригер",years:"р. 2000",role:"Корреспондент SOTAvision",accent:"#00BCD4",photo:"",
- text:"Освещал задержания на акциях и суды над активистами. Проходит по тому же делу о работе с материалами ФБК; на момент ареста ему было двадцать три года.",
- record:"Дело журналистов · 5,5 лет"},
+{
+  group: "prison", sphere: "politics", name: "Алексей Горинов", years: "р. 1961", role: "Муниципальный депутат", accent: "#FF7043", photo: "",
+  text: "Первый осуждённый по статье о «фейках» об армии. Получил повторный приговор в колонии.",
+  fullBio: "Алексей Горинов — депутат совета Красносельского округа Москвы. Осужден за предложение почтить память погибших детей в Украине.",
+  quote: "Я считаю, что все усилия должны быть направлены на то, чтобы остановить войну.",
+  timeline: [
+    { year: "2022", text: "Приговор к 7 годам колонии." },
+    { year: "2024", text: "Второй приговор прямо в заключении." }
+  ],
+  links: [],
+  record: "ст. 207.3 УК · 7 лет + 5 лет"
+},
+{
+  group: "prison", sphere: "journalism", name: "Иван Сафронов", years: "р. 1990", role: "Военный журналист", accent: "#64B5F6", photo: "",
+  text: "Писал о ВПК для «Коммерсанта». Приговорён к 22 годам строгой колонии по делу о «госизмене».",
+  fullBio: "Иван Сафронов — корреспондент, освещавший оборонную тематику. Осуждён за передачу сведений, находившихся в открытом доступе.",
+  quote: "Честная журналистика — это не преступление.",
+  timeline: [
+    { year: "2020", text: "Задержание сотрудниками ФСБ." },
+    { year: "2022", text: "Приговор: 22 года строгого режима." }
+  ],
+  links: [],
+  record: "ст. 275 УК · 22 года строгого режима"
+},
+{
+  group: "prison", sphere: "rights", name: "Юрий Дмитриев", years: "р. 1956", role: "Историк «Мемориала»", accent: "#A5D6A7", photo: "",
+  text: "Открыл массовые захоронения расстрелянных в Сандармохе. Приговорён к 15 годам колонии.",
+  fullBio: "Юрий Дмитриев — исследователь репрессий, установивший имена тысяч расстрелянных в Карелии. Уголовное дело против него признано сфабрикованным.",
+  quote: "Человек не должен исчезать бесследно.",
+  timeline: [
+    { year: "1997", text: "Открытие мемориала Сандармох." },
+    { year: "2021", text: "Увеличение срока до 15 лет колонии." }
+  ],
+  links: [],
+  record: "15 лет строгого режима"
+},
+{
+  group: "prison", sphere: "science", name: "Азат Мифтахов", years: "р. 1993", role: "Математик, аспирант МГУ", accent: "#4DD0E1", photo: "",
+  text: "Отсидел 6 лет по делу о разбитом окне, в день освобождения был арестован заново.",
+  fullBio: "Азат Мифтахов — математик, обвиненный на основе показаний секретных свидетелей. В день выхода из колонии отправлен в СИЗО по новому делу.",
+  quote: "Науку и свободу мысли нельзя закрыть в камере.",
+  timeline: [
+    { year: "2019", text: "Задержание и сообщения о пытках." },
+    { year: "2024", text: "Новый приговор в день освобождения." }
+  ],
+  links: [],
+  record: "6 лет + новый приговор"
+},
+{
+  group: "prison", sphere: "journalism", name: "Мария Пономаренко", years: "р. 1979", role: "Журналистка", accent: "#F48FB1", photo: "",
+  text: "Осуждена за пост о драмтеатре в Мариуполе. В колонии подвергалась принудительной психиатрии.",
+  fullBio: "Мария Пономаренко — журналистка из Барнаула, приговорённая к 6 годам колонии за публикацию антивоенного поста.",
+  quote: "Правда не становится ложью от решения суда.",
+  timeline: [
+    { year: "2023", text: "Приговор к 6 годам лишения свободы." }
+  ],
+  links: [],
+  record: "6 лет колонии"
+},
+{
+  group: "prison", sphere: "culture", name: "Евгения Беркович", years: "р. 1985", role: "Режиссёр", accent: "#BA68C8", photo: "",
+  text: "Осуждена на 6 лет за спектакль «Финист Ясный Сокол», получивший «Золотую маску».",
+  fullBio: "Евгения Беркович — театральный режиссёр. Осуждена по обвинению в « оправдании терроризма» за антитеррористическую пьесу.",
+  quote: "Мы поставили спектакль о трагедии, а нас сделали преступниками.",
+  timeline: [
+    { year: "2022", text: "Премия «Золотая маска» за спектакль." },
+    { year: "2024", text: "Приговор: 6 лет колонии." }
+  ],
+  links: [],
+  record: "ст. 205.2 УК · 6 лет колонии"
+},
+{
+  group: "prison", sphere: "culture", name: "Светлана Петрийчук", years: "р. 1980", role: "Драматург", accent: "#9575CD", photo: "",
+  text: "Автор пьесы «Финист Ясный Сокол». Получила 6 лет колонии вместе с режиссёром Беркович.",
+  fullBio: "Светлана Петрийчук — драматург и сценарист. Осуждена за литературное произведение, признанное мировым театральным сообществом.",
+  quote: "Искусство призвано задавать сложные вопросы.",
+  timeline: [
+    { year: "2024", text: "Приговор к 6 годам лишения свободы." }
+  ],
+  links: [],
+  record: "ст. 205.2 УК · 6 лет колонии"
+},
+{
+  group: "prison", sphere: "politics", name: "Лилия Чанышева", years: "р. 1982", role: "Экс-координатор штаба в Уфе", accent: "#FFA726", photo: "",
+  text: "Первая задержанная региональная активистка ФБК. Осуждена задним числом.",
+  fullBio: "Лилия Чанышева — аудитор, возглавлявшая штаб Навального в Уфе. Была приговорена к 7,5 годам (затем срок увеличен до 9.5 лет).",
+  quote: "Моя работа всегда была открытой и законной.",
+  timeline: [
+    { year: "2021", text: "Арест в Уфе по делу об «экстремизме»." },
+    { year: "2023", text: "Обвинение и приговор к 7,5 годам." }
+  ],
+  links: [],
+  record: "9,5 лет колонии"
+},
+{
+  group: "prison", sphere: "rights", name: "Игорь Барышников", years: "р. 1959", role: "Активист из Калининграда", accent: "#90CAF9", photo: "",
+  text: "Осуждён за антивоенные посты. Тяжело болен онкологией, суды отказывают в освобождении.",
+  fullBio: "Игорь Барышников — пенсионер из Калининградской области. Несмотря на тяжелейшее заболевание, приговорен к 7,5 годам.",
+  quote: "Милосердие должно быть выше формальных статей.",
+  timeline: [
+    { year: "2023", text: "Приговор: 7,5 лет колонии." }
+  ],
+  links: [],
+  record: "7,5 лет колонии"
+},
+{
+  group: "prison", sphere: "rights", name: "Михаил Кригер", years: "р. 1960", role: "Правозащитник", accent: "#80CBC4", photo: "",
+  text: "Участник одиночных пикетов с 1990-х годов. Получил 7 лет за комментарий в соцсети.",
+  fullBio: "Михаил Кригер — ветеран протестного движения Москвы, организовывал помощь политзаключенным. Осужден за комментарий в Facebook.",
+  quote: "Молчать, когда совершается несправедливость — соучастие.",
+  timeline: [
+    { year: "2023", text: "Приговор к 7 годам колонии." }
+  ],
+  links: [],
+  record: "7 лет колонии"
+},
+{
+  group: "prison", sphere: "science", name: "Дмитрий Иванов", years: "р. 1999", role: "Студент МГУ", accent: "#7E9CFF", photo: "",
+  text: "Создатель канала «Протестный МГУ». Осуждён на 8,5 лет за публикацию новостей.",
+  fullBio: "Дмитрий Иванов — студент механико-математического факультета МГУ. Был арестован прямо во время сдачи сессии.",
+  quote: "Университет — это место свободных людей.",
+  timeline: [
+    { year: "2022", text: "Арест и исключение с факультета." },
+    { year: "2023", text: "Приговор к 8,5 годам колонии." }
+  ],
+  links: [],
+  record: "8,5 лет колонии"
+},
+{
+  group: "prison", sphere: "journalism", name: "Антонина Фаворская", years: "р. 1990", role: "Журналистка SOTAvision", accent: "#EC407A", photo: "",
+  text: "Освещала суды над Навальным и его похороны. Осуждена по делу об «участии в ФБК».",
+  fullBio: "Антонина Фаворская — видеожурналистка, снимавшая последние видеозаписи с Алексеем Навальным из колонии.",
+  quote: "Журналист обязан показывать то, что происходит на самом деле.",
+  timeline: [
+    { year: "2024", text: "Арест после освещения похорон Навального." }
+  ],
+  links: [],
+  record: "Арестована по «делу журналистов»"
+},
+{
+  group: "prison", sphere: "journalism", name: "Артём Кригер", years: "р. 2000", role: "Корреспондент SOTAvision", accent: "#00BCD4", photo: "",
+  text: "Освещал акции протеста и суды. Задержан в 23 года по обвинению в работе на ФБК.",
+  fullBio: "Артём Кригер — молодой журналист, ведавший стримами с акционерных площадок и судебных заседаний.",
+  quote: "Правда не может быть экстремизмом.",
+  timeline: [
+    { year: "2024", text: "Задержание и водворение в СИЗО." }
+  ],
+  links: [],
+  record: "Находится в СИЗО"
+},
+{
+  group: "prison", sphere: "politics", name: "Вадим Останкин", years: "р. 1970", role: "Активист из Златоуста", accent: "#A1887F", photo: "",
+  text: "Возглавлял штаб в Златоусте. Осужден на 8 лет за продолжение политической деятельности.",
+  fullBio: "Вадим Останкин — региональный активист, помогавший местным жителям бороться с произволом ЖКХ и экопроблемами.",
+  quote: "Защита своего города — это норма для гражданина.",
+  timeline: [
+    { year: "2023", text: "Приговор к 8 годам колонии." }
+  ],
+  links: [],
+  record: "8 лет колонии"
+},
+{
+  group: "prison", sphere: "politics", name: "Александр Шестун", years: "р. 1964", role: "Экс-глава Серпуховского района", accent: "#8D6E63", photo: "",
+  text: "Опубликовал записи угроз со стороны генералов ФСБ. Получил 15 лет колонии.",
+  fullBio: "Александр Шестун — чиновник, выступивший против закрытия мусорных полигонов и вымогательства. Отбыл множественные голодовки.",
+  quote: "Я отказался выполнять незаконные приказы.",
+  timeline: [
+    { year: "2018", text: "Публикация видеообращения к президенту с аудиазаписями угроз." },
+    { year: "2020", text: "Приговор: 15 лет колонии." }
+  ],
+  links: [],
+  record: "15 лет колонии"
+},
+{
+  group: "prison", sphere: "politics", name: "Даниэль Холодный", years: "р. 1997", role: "Технический директор YouTube-канала", accent: "#78909C", photo: "",
+  text: "Осужден на 8 лет вместе с Навальным за обеспечение видеотрансляций.",
+  fullBio: "Даниэль Холодный — IT-специалист, занимавшийся технической частью видеопродакшна Навального.",
+  quote: "Работа с техникой не должна приравниваться к преступлению.",
+  timeline: [
+    { year: "2023", text: "Приговор: 8 лет колонии общего режима." }
+  ],
+  links: [],
+  record: "8 лет колонии"
+},
 
 /* ── В ИЗГНАНИИ И ПОД ДАВЛЕНИЕМ ──────────────────────────── */
-{group:"exile",name:"Владимир Кара-Мурза",years:"р. 1981",role:"Историк, публицист",accent:"#7986CB",photo:"",
- text:"Соратник Немцова, добивался принятия персональных санкций против причастных к репрессиям. Дважды пережил отравление с отказом всех органов. Получил самый большой политический срок в новейшей истории и вышел на свободу при обмене в августе 2024 года.",
- record:"25 лет за госизмену · освобождён 1 августа 2024"},
-{group:"exile",name:"Илья Яшин",years:"р. 1983",role:"Муниципальный депутат",accent:"#4DB6AC",photo:"",
- text:"Осуждён за стрим о событиях в Буче. Отказался просить о помиловании и заявил, что не хочет уезжать; из страны его вывезли при обмене против его воли.",
- record:"8,5 лет · освобождён 1 августа 2024"},
-{group:"exile",name:"Андрей Пивоваров",years:"р. 1981",role:"Глава «Открытой России»",accent:"#FFCA28",photo:"",
- text:"Снят с самолёта в петербургском аэропорту за пост в фейсбуке — публикацию признали «деятельностью нежелательной организации». Больше года провёл в карцерах.",
- record:"4 года · освобождён 1 августа 2024"},
-{group:"exile",name:"Олег Орлов",years:"р. 1953",role:"Сопредседатель «Мемориала»",accent:"#AED581",photo:"",
- text:"Возглавлял правозащитный центр, получивший Нобелевскую премию мира в 2022 году. В семьдесят лет осуждён за статью, в которой назвал происходящее в стране фашизмом.",
- record:"2,5 года · освобождён 1 августа 2024"},
-{group:"exile",name:"Александра Скочиленко",years:"р. 1990",role:"Художница и музыкант",accent:"#F48FB1",photo:"",
- text:"Заменила пять ценников в супермаркете на бумажки с информацией о войне. Провела почти два года в СИЗО, где ей — человеку с целиакией — не давали подходящей еды.",
- record:"7 лет · освобождена 1 августа 2024"},
-{group:"exile",name:"Ксения Фадеева",years:"р. 1990",role:"Депутат гордумы Томска",accent:"#4FC3F7",photo:"",
- text:"Возглавляла томский штаб Навального и была избрана в городскую думу. Получила девять лет по делу об «экстремистском сообществе».",
- record:"9 лет · освобождена 1 августа 2024"},
-{group:"exile",name:"Михаил Ходорковский",years:"р. 1963",role:"Бывший глава ЮКОСа",accent:"#5C6BC0",photo:"",
- text:"Провёл десять лет в тюрьме после того, как вступил в публичный спор с президентом о коррупции. После помилования основал «Открытую Россию», затем — Антивоенный комитет.",
- record:"10 лет · помилован в декабре 2013"},
-{group:"exile",name:"Гарри Каспаров",years:"р. 1963",role:"Чемпион мира по шахматам",accent:"#78909C",photo:"",
- text:"Оставил шахматы ради политики в 2005 году, когда почти никто не верил в опасность происходящего. Один из создателей Форума свободной России.",
- record:"В эмиграции с 2013 года"},
-{group:"exile",name:"Дмитрий Муратов",years:"р. 1961",role:"Главный редактор «Новой газеты»",accent:"#FFD54F",photo:"",
- text:"Руководил газетой, шестеро сотрудников которой были убиты. Получил Нобелевскую премию мира и продал медаль за 103,5 миллиона долларов в помощь детям-беженцам из Украины.",
- record:"Нобелевская премия мира 2021 · газета остановлена"},
-{group:"exile",name:"Юлия Навальная",years:"р. 1976",role:"Политик",accent:"#EF5350",photo:"",
- text:"После гибели мужа возглавила его команду и продолжила публичную политическую работу — от обращения к европейским парламентам до кампаний против военного финансирования.",
- record:"Возглавила движение в феврале 2024"},
-{group:"exile",name:"Мария Певчих",years:"р. 1987",role:"Руководитель расследований ФБК",accent:"#F06292",photo:"",
- text:"Вела расследование отравления Навального и выпустила фильм «Предатели». Её работа стала основой для десятков персональных санкций.",
- record:"Заочные уголовные дела"},
-{group:"exile",name:"Леонид Волков",years:"р. 1980",role:"Политик, программист",accent:"#FF5252",photo:"",
- text:"Много лет строил сеть региональных штабов и систему «Умного голосования». В марте 2024 года на него напали с молотком у собственного дома в Вильнюсе.",
- record:"Нападение в Вильнюсе · март 2024"},
-{group:"exile",name:"Иван Жданов",years:"р. 1988",role:"Директор ФБК",accent:"#E57373",photo:"",
- text:"Юрист, выигрывал суды против чиновников по искам о раскрытии информации. Его отца, чиновника на пенсии, посадили по сфабрикованному делу — чтобы надавить на сына.",
- record:"Заочные приговоры · отец под уголовным делом"},
-{group:"exile",name:"Любовь Соболь",years:"р. 1987",role:"Юрист ФБК",accent:"#FF7043",photo:"",
- text:"Вела расследования о госзакупках и кампанию «Умного голосования», участвовала в голодовке за допуск независимых кандидатов на выборах в Мосгордуму.",
- record:"Заочный приговор"},
-{group:"exile",name:"Владимир Милов",years:"р. 1972",role:"Экономист",accent:"#26A69A",photo:"",
- text:"Бывший заместитель министра энергетики, соавтор докладов «Путин. Итоги». Разбирает экономику режима и эффективность санкций.",
- record:"Иноагент · в эмиграции"},
-{group:"exile",name:"Максим Кац",years:"р. 1984",role:"Политик, блогер",accent:"#FFB300",photo:"",
- text:"Бывший муниципальный депутат Москвы, занимался городскими кампаниями и избирательными технологиями. Ведёт один из крупнейших русскоязычных политических YouTube-каналов.",
- record:"Заочный приговор · 8 лет"},
-{group:"exile",name:"Евгений Ройзман",years:"р. 1962",role:"Бывший мэр Екатеринбурга",accent:"#A1887F",photo:"",
- text:"Единственный независимый политик, избранный мэром города-миллионника при этой власти. Остался в России после начала войны; осуждён за «дискредитацию армии» и лишён права публичной деятельности.",
- record:"Остаётся в России · штраф и запрет деятельности"},
-{group:"exile",name:"Лев Шлосберг",years:"р. 1963",role:"Депутат, «Яблоко»",accent:"#66BB6A",photo:"",
- text:"Первым рассказал о псковских десантниках, погибших на Донбассе в 2014 году, — и был жестоко избит через несколько дней. Продолжает работать в Пскове.",
- record:"Иноагент · остаётся в России"},
-{group:"exile",name:"Дмитрий Гудков",years:"р. 1980",role:"Бывший депутат Госдумы",accent:"#4DD0E1",photo:"",
- text:"Один из немногих депутатов, голосовавших против репрессивных законов. После задержания в 2021 году был вынужден уехать из страны.",
- record:"В эмиграции с 2021 года"},
-{group:"exile",name:"Лев Пономарёв",years:"р. 1941",role:"Правозащитник",accent:"#9CCC65",photo:"",
- text:"Один из создателей «Мемориала» и движения «За права человека», полвека занимается защитой политзаключённых. Признан иноагентом, вынужден был уехать.",
- record:"Иноагент · в эмиграции"}
+{
+  group: "exile", sphere: "politics", name: "Владимир Кара-Мурза", years: "р. 1981", role: "Историк, политик", accent: "#7986CB", photo: "",
+  text: "Добился принятия «Закона Магнитского». Получил 25 лет за госизмену, освобождён при обмене 2024 года.",
+  fullBio: "Владимир Кара-Мурза — политик, переживший два отравления. В 2023 году приговорён к 25 годам колонии. Освобождён в ходе обмена 1 августа 2024 года.",
+  quote: "Ночь перед рассветом всегда самая темная.",
+  timeline: [
+    { year: "2012", text: "Принятие Закона Магнитского." },
+    { year: "2024", text: "Освобождение в рамках обмена заключенными." }
+  ],
+  links: [],
+  record: "Освобождён при обмене 1 августа 2024"
+},
+{
+  group: "exile", sphere: "politics", name: "Илья Яшин", years: "р. 1983", role: "Политик", accent: "#4DB6AC", photo: "",
+  text: "Осуждён за антивоенный стрим на 8,5 лет. Отказался уезжать, вывезен при обмене против воли.",
+  fullBio: "Илья Яшин — экс-глава Красносельского муниципального округа. Отбывал срок за разоблачение событий в Буче.",
+  quote: "Я остаюсь в России, потому что это моя страна.",
+  timeline: [
+    { year: "2022", text: "Приговор: 8,5 лет колонии." },
+    { year: "2024", text: "Выслан из страны в ходе обмена." }
+  ],
+  links: [],
+  record: "Освобождён при обмене 1 августа 2024"
+},
+{
+  group: "exile", sphere: "politics", name: "Андрей Пивоваров", years: "р. 1981", role: "Экс-глава «Открытой России»", accent: "#FFCA28", photo: "",
+  text: "Снят с самолета перед вылетом за пост в соцсети. Освобождён при обмене 2024 года.",
+  fullBio: "Андрей Пивоваров — политик, осужденный за руководство «нежелательной организацией». Провёл более 3 лет в тюрьме.",
+  quote: "Свободное общество начинается с личного выбора.",
+  timeline: [
+    { year: "2021", text: "Задержание в аэропорту Пулково." },
+    { year: "2024", text: "Освобождение при обмене." }
+  ],
+  links: [],
+  record: "Освобождён при обмене 1 августа 2024"
+},
+{
+  group: "exile", sphere: "rights", name: "Олег Орлов", years: "р. 1953", role: "Сопредседатель «Мемориала»", accent: "#AED581", photo: "",
+  text: "В 70 лет осужден за статью, назвал происходящее в стране фашизмом. Освобождён при обмене.",
+  fullBio: "Олег Орлов — правозащитник с 40-летним стажем. Сопредседатель центра «Мемориал», получившего Нобелевскую премию мира 2022 года.",
+  quote: "Я не жалею ни о чем и ничего не боюсь.",
+  timeline: [
+    { year: "2022", text: "Нобелевская премия мира центру «Мемориал»." },
+    { year: "2024", text: "Освобождение в рамках обмена." }
+  ],
+  links: [],
+  record: "Освобождён при обмене 1 августа 2024"
+},
+{
+  group: "exile", sphere: "culture", name: "Александра Скочиленко", years: "р. 1990", role: "Художница, музыкант", accent: "#F48FB1", photo: "",
+  text: "Заменила ценники в супермаркете на антивоенные листовки. Получила 7 лет, освобождена при обмене.",
+  fullBio: "Саша Скочиленко — художница из Петербурга. Провела 2 года в СИЗО, имея тяжелые заболевания целиакию и порок сердца.",
+  quote: "Мир ценнее любых амбиций.",
+  timeline: [
+    { year: "2022", text: "Ация с ценниками в магазине «Перекресток»." },
+    { year: "2024", text: "Освобождение при обмене." }
+  ],
+  links: [],
+  record: "Освобождена при обмене 1 августа 2024"
+},
+{
+  group: "exile", sphere: "politics", name: "Ксения Фадеева", years: "р. 1990", role: "Депутат гордумы Томска", accent: "#4FC3F7", photo: "",
+  text: "Избранный депутат, получила 9 лет колонии за прошлую работу. Освобождена при обмене.",
+  fullBio: "Ксения Фадеева — независимый депутат думы Томска. Была осуждена по делу об «экстремистском сообществе» задним числом.",
+  quote: "Люди доверили мне свои голоса, и я не могла их предать.",
+  timeline: [
+    { year: "2020", text: "Избрание в городскую думу Томска." },
+    { year: "2024", text: "Освобождение при обмене." }
+  ],
+  links: [],
+  record: "Освобождена при обмене 1 августа 2024"
+},
+{
+  group: "exile", sphere: "politics", name: "Михаил Ходорковский", years: "р. 1963", role: "Общественный деятель", accent: "#5C6BC0", photo: "",
+  text: "Провёл 10 лет в тюрьме после спора с Путиным о коррупции. Основатель Антивоенного комитета.",
+  fullBio: "Михаил Ходорковский — экс-глава компании ЮКОС. Провел 10 лет в заключении по «делу ЮКОСа». После освобождения основал независимые медиа и общественные проекты.",
+  quote: "Главное в тюрьме — сохранить внутреннее достоинство.",
+  timeline: [
+    { year: "2003", text: "Арест в аэропорту Новосибирска." },
+    { year: "2013", text: "Помилование и высылка из страны." }
+  ],
+  links: [],
+  record: "10 лет заключения · Помилован в 2013"
+},
+{
+  group: "exile", sphere: "politics", name: "Гарри Каспаров", years: "р. 1963", role: "Чемпион мира по шахматам, политик", accent: "#78909C", photo: "",
+  text: "13-й чемпион мира по шахматам, один из лидеров Форума свободной России.",
+  fullBio: "Гарри Каспаров — великий шахматист, ушедший из спорта в 2005 году для создания оппозиционной коалиции «Другая Россия». Сосоздатель Форума свободной России.",
+  quote: "В диктатуре нет правил, кроме тех, что устанавливает власть.",
+  timeline: [
+    { year: "2005", text: "Завершение шахматной карьеры и уход в политику." },
+    { year: "2013", text: "Вынужденная эмиграция из-за угроз преследования." }
+  ],
+  links: [],
+  record: "В эмиграции с 2013 года"
+},
+{
+  group: "exile", sphere: "journalism", name: "Дмитрий Муратов", years: "р. 1961", role: "Главред «Новой газеты»", accent: "#FFD54F", photo: "",
+  text: "Лауреат Нобелевской премии мира 2021 года. Продал медаль для помощи беженцам.",
+  fullBio: "Дмитрий Муратов — сооснователь и бессменный редактор «Новой газеты», шестеро журналистов которой были убиты за свои расследования.",
+  quote: "Мир разлюбил демократию. Мир разочаровался в правящей элите.",
+  timeline: [
+    { year: "2021", text: "Присуждение Нобелевской премии мира." },
+    { year: "2022", text: "Продажа нобелевской медали на аукционе за $103,5 млн." }
+  ],
+  links: [],
+  record: "Нобелевская премия мира 2021"
+},
+{
+  group: "exile", sphere: "politics", name: "Юлия Навальная", years: "р. 1976", role: "Политик, общественный деятель", accent: "#EF5350", photo: "",
+  text: "Продолжила дело погибшего мужа, возглавив международную кампанию за свободу РФ.",
+  fullBio: "Юлия Навальная — экономист, супруга Алексея Навального. После его гибели в колонии заявила о продолжении борьбы за демократическую Россию.",
+  quote: "Я буду продолжать дело Алексея Навального.",
+  timeline: [
+    { year: "2020", text: "Организация эвакуации отравленного мужа в Германию." },
+    { year: "2024", text: "Заявление о продолжении политической работы." }
+  ],
+  links: [],
+  record: "Председатель Human Rights Foundation"
+},
+{
+  group: "exile", sphere: "politics", name: "Максим Кац", years: "р. 1984", role: "Политик, урбанист", accent: "#FFB300", photo: "",
+  text: "Ведёт крупнейший политический YouTube-канал. Заочно приговорён к 8 годам колонии.",
+  fullBio: "Максим Кац — экс-депутат Щукино, основатель фонда «Городские проекты». Ведет ежедневные аналитические видеопрограммы с миллионными просмотрами.",
+  quote: "Все будет хорошо, и Россия будет свободной.",
+  timeline: [
+    { year: "2012", text: "Избрание муниципальным депутатом." },
+    { year: "2023", text: "Заочный приговор: 8 лет колонии." }
+  ],
+  links: [],
+  record: "Заочно приговорён к 8 годам"
+},
+{
+  group: "exile", sphere: "politics", name: "Евгений Ройзман", years: "р. 1962", role: "Экс-мэр Екатеринбурга", accent: "#A1887F", photo: "",
+  text: "Единственный независимый мэр миллионника. Осужден за «дискредитацию», остается в РФ.",
+  fullBio: "Евгений Ройзман — политик, поэт, бывший глава Екатеринбурга. Принципиально отказался уезжать из России несмотря на уголовный срок и запрет действий.",
+  quote: "Каждый должен делать то, что должен, на своем месте.",
+  timeline: [
+    { year: "2013", text: "Победа на выборах мэра Екатеринбурга." },
+    { year: "2023", text: "Судебный штраф и запрет публичной деятельности." }
+  ],
+  links: [],
+  record: "Остаётся в Екатеринбурге"
+},
+{
+  group: "exile", sphere: "journalism", name: "Мария Певчих", years: "р. 1987", role: "Глава расследований ФБК", accent: "#F06292", photo: "",
+  text: "Руководитель отдела расследований ФБК, автор фильмов про коррупцию в верхах.",
+  fullBio: "Мария Певчих — расследователь, соавтор ключевых расследований о собственности чиновников, олигархов и лично Владимира Путина.",
+  quote: "Коррупция — это не просто кража денег, это разрушение государства.",
+  timeline: [
+    { year: "2020", text: "Расследование отравления Алексея Навального." },
+    { year: "2023", text: "Глава совета директоров ФБК." }
+  ],
+  links: [],
+  record: "Заочные уголовные дела"
+},
+{
+  group: "exile", sphere: "politics", name: "Леонид Волков", years: "р. 1980", role: "Политик, IT-специалист", accent: "#FF5252", photo: "",
+  text: "Организатор сети региональных штабов. Пережил нападение с молотком в Вильнюсе.",
+  fullBio: "Леонид Волков — экс-депутат Екатеринбурга, руководитель предвыборного штаба Навального 2018 года. Весной 2024 пережил покушение у своего дома.",
+  quote: "Организационные структуры сильнее отдельных репрессивных актов.",
+  timeline: [
+    { year: "2017", text: "Руководство президентской кампанией Навального." },
+    { year: "2024", text: "Нападение с молотком в Вильнюсе." }
+  ],
+  links: [],
+  record: "Нападение в Вильнюсе (март 2024)"
+},
+{
+  group: "exile", sphere: "rights", name: "Лев Шлосберг", years: "р. 1963", role: "Депутат, член партии «Яблоко»", accent: "#66BB6A", photo: "",
+  text: "Первым расследовал гибель псковских десантников на Донбассе в 2014 году. Работает в Пскове.",
+  fullBio: "Лев Шлосберг — псковский политик, издатель газеты «Псковская губерния». Был жестоко избит после публикации о секретных похоронах десантников.",
+  quote: "Правда требует присутствия на своей земле.",
+  timeline: [
+    { year: "2014", text: "Расследование гибели псковских десантников." },
+    { year: "2021", text: "Снятие с выборов по репрессивным законам." }
+  ],
+  links: [],
+  record: "Остаётся в Пскове"
+},
+{
+  group: "exile", sphere: "culture", name: "Дмитрий Быков", years: "р. 1967", role: "Писатель, поэт", accent: "#AB47BC", photo: "",
+  text: "Писатель и лектор. Пережил отравление аналогичными веществом «Новичок» в 2019 году.",
+  fullBio: "Дмитрий Быков — публицист, литературовед. В 2019 году был отравлен во время поездки по регионам сотрудниками той же группы ФСБ.",
+  quote: "Литература всегда переживает своих цензоров.",
+  timeline: [
+    { year: "2019", text: "Отравление во время перелета в Уфу." },
+    { year: "2022", text: "Признание «иноагентом» и увольнение из вузов." }
+  ],
+  links: [],
+  record: "Признан «иноагентом» · В эмиграции"
+},
+{
+  group: "exile", sphere: "culture", name: "Михаил Шац", years: "р. 1965", role: "Телеведущий, шоумен", accent: "#26C6DA", photo: "",
+  text: "Популярный артист, ушедший в оппозицию. Осудил войну и ведет благотворительные проекты.",
+  fullBio: "Михаил Шац — врач, телеведущий, лауреат «ТЭФИ». Участник Координационного совета оппозиции 2012 года.",
+  quote: "Смех и юмор — лучшее лекарство от страха.",
+  timeline: [
+    { year: "2012", text: "Избрание в Координационный совет оппозиции." },
+    { year: "2022", text: "Вынужденный отъезд из России." }
+  ],
+  links: [],
+  record: "Признан «иноагентом»"
+},
+{
+  group: "exile", sphere: "rights", name: "Лев Пономарёв", years: "р. 1941", role: "Правозащитник", accent: "#9CCC65", photo: "",
+  text: "Сооснователь «Мемориала» и движения «За права человека». Полвека защищает политзаключенных.",
+  fullBio: "Лев Пономарёв — доктор физико-математических наук, народный депутат РФ (1990–1993). Основатель движения «За права человека».",
+  quote: "Права человека не имеют государственных границ.",
+  timeline: [
+    { year: "1989", text: "Сосоздатель общества «Мемориал»." },
+    { year: "2020", text: "Внесение в первый список «физлиц-иноагентов»." }
+  ],
+  links: [],
+  record: "Признан «иноагентом»"
+},
+{
+  group: "exile", sphere: "politics", name: "Любовь Соболь", years: "р. 1987", role: "Юрист ФБК", accent: "#FF7043", photo: "",
+  text: "Вела расследования о школьном питании и госзакупках. Провела 32-дневную голодовку.",
+  fullBio: "Любовь Соболь — юрист, выдвигалась на выборах в Мосгордуму 2019 года. Из-за недопуска кандидатов держала месячную голодовку.",
+  quote: "Закон должен работать для людей, а не для защиты чиновников.",
+  timeline: [
+    { year: "2019", text: "Голодовка протеста против фальсификации выборов." }
+  ],
+  links: [],
+  record: "Заочный приговор"
+},
+{
+  group: "exile", sphere: "culture", name: "Артур Смольянинов", years: "р. 1983", role: "Актер театра и кино", accent: "#EC407A", photo: "",
+  text: "Звезда фильма «9 рота», публично выступивший против войны. Внесен в список «экстремистов».",
+  fullBio: "Артур Смольянинов — популярный российский актер. После начала полномасштабного вторжения открыто осудил действия властей и покинул страну.",
+  quote: "Искусство не может служить оправданием насилия.",
+  timeline: [
+    { year: "2022", text: "Публичное антивоенное заявление и отъезд из РФ." }
+  ],
+  links: [],
+  record: "Внесен в реестр «экстремистов»"
+}
 ];
 
 const GROUPS = [
-  {id:"killed",     title:"Убиты и погибли",             note:"Люди, чья публичная работа закончилась убийством или смертью под стражей. Ни в одном из этих дел заказчики не названы."},
-  {id:"prison",     title:"За решёткой сейчас",           note:"Приговоры вынесены по статьям о «фейках», «оправдании терроризма», «экстремизме» и госизмене."},
-  {id:"exile",      title:"В изгнании и под давлением",   note:"Часть из них вышла на свободу при обмене 1 августа 2024 года и была вывезена из страны, часть работает из-за границы, некоторые остаются в России."},
-  {id:"dissidents", title:"Те, кто начал раньше",         note:"Советское правозащитное движение: люди, задавшие язык и практику, которыми пользуются до сих пор."}
+  { id: "killed", title: "Убиты и погибли", note: "Люди, чья публичная работа закончилась убийством или смертью под стражей." },
+  { id: "prison", title: "За решёткой сейчас", note: "Приговоры вынесены по статьи о «фейках», «экстремизме» и госизмене." },
+  { id: "exile", title: "В изгнании и под давлением", note: "Часть вывезена при обмене 2024 года, часть работает из-за границы, некоторые остаются в РФ." },
+  { id: "dissidents", title: "Советские диссиденты", note: "Люди, заложившие основы правозащитного движения в СССР." }
 ];
 
-/* ── Отрисовка ───────────────────────────────────────────── */
-const list = document.getElementById('list');
-const initials = n => n.split(' ').map(w=>w[0]).slice(0,2).join('');
-const slug = n => 'p-' + n.replace(/[^\wА-Яа-яЁё]+/g,'-').toLowerCase();
+const SPHERES = [
+  { id: "all", title: "Все сферы" },
+  { id: "politics", title: "Политика" },
+  { id: "journalism", title: "Журналистика" },
+  { id: "rights", title: "Правозащита" },
+  { id: "culture", title: "Культура и искусство" },
+  { id: "science", title: "Наука и образование" }
+];
 
-GROUPS.forEach(g=>{
-  const people = PEOPLE.filter(p=>p.group===g.id);
-  if(!people.length) return;
-  const sec = document.createElement('section');
-  sec.className='group'; sec.dataset.group=g.id;
-  sec.innerHTML = `<div class="group-head">
-      <h2>${g.title}</h2><span class="group-count">${people.length}</span>
-      <p class="group-note">${g.note}</p>
-    </div>` +
-    people.map((p,i)=>`
-      <article class="person${i%2?' flip':''}" id="${slug(p.name)}" style="--pc:${p.accent}" data-accent="${p.accent}">
+/* ── Логика приложения ────────────────────────────────────── */
+
+const list = document.getElementById('list');
+const searchInput = document.getElementById('searchInput');
+const clearSearch = document.getElementById('clearSearch');
+const statusChips = document.getElementById('statusChips');
+const sphereChips = document.getElementById('sphereChips');
+const modal = document.getElementById('modal');
+const toast = document.getElementById('toast');
+const backToTopBtn = document.getElementById('backToTop');
+
+let activeGroup = 'all';
+let activeSphere = 'all';
+let currentObservedAccent = '#E53935';
+
+const initials = n => n.split(' ').map(w => w[0]).slice(0, 2).join('');
+const slug = n => 'p-' + n.replace(/[^\wА-Яа-яЁё]+/g, '-').toLowerCase();
+
+function setAccent(color) {
+  if (!color) return;
+  document.documentElement.style.setProperty('--accent', color);
+}
+
+function renderList() {
+  list.innerHTML = '';
+
+  GROUPS.forEach(g => {
+    const people = PEOPLE.filter(p => p.group === g.id);
+    if (!people.length) return;
+
+    const sec = document.createElement('section');
+    sec.className = 'group';
+    sec.dataset.group = g.id;
+
+    sec.innerHTML = `
+      <div class="group-head">
+        <h2>${g.title}</h2><span class="group-count">${people.length}</span>
+        <p class="group-note">${g.note}</p>
+      </div>
+    `;
+
+    people.forEach((p, i) => {
+      const article = document.createElement('article');
+      article.className = `person${i % 2 ? ' flip' : ''}`;
+      article.id = slug(p.name);
+      article.style.setProperty('--pc', p.accent);
+      article.dataset.accent = p.accent;
+      article.personData = p;
+
+      article.innerHTML = `
         <div class="portrait">
-          ${p.photo?`<img src="${p.photo}" alt="${p.name}" loading="lazy" onerror="this.remove()">`:''}
+          ${p.photo ? `<img src="${p.photo}" alt="${p.name}" loading="lazy" onerror="this.remove()">` : ''}
           <span class="initials" aria-hidden="true">${initials(p.name)}</span>
         </div>
         <div class="body">
           <p class="meta">${p.years} · ${p.role}</p>
           <h3>${p.name}</h3>
           <p class="text">${p.text}</p>
-          <p class="record">${p.record}</p>
+          <div class="card-footer-row">
+            <span class="record">${p.record}</span>
+            <div class="card-actions">
+              <button class="btn-more" aria-label="Подробнее">Подробнее →</button>
+              <button class="btn-icon-share" title="Скопировать ссылку" aria-label="Ссылка">🔗</button>
+            </div>
+          </div>
         </div>
-      </article>`).join('');
-  list.appendChild(sec);
-});
+      `;
 
-document.getElementById('markCount').textContent = PEOPLE.length;
+      article.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-icon-share')) {
+          e.stopPropagation();
+          copyShareLink(p);
+        } else {
+          openModal(p);
+        }
+      });
 
-/* стена имён */
-document.getElementById('namewall').innerHTML = PEOPLE.map(p=>
-  `<a href="#${slug(p.name)}" style="--nm:${p.accent}" class="${p.group==='killed'||p.group==='dissidents'&&p.years.includes('—')?'gone':''}">${p.name}</a>`
-).join('<span aria-hidden="true"> · </span>');
+      sec.appendChild(article);
+    });
 
-document.querySelectorAll('.namewall a').forEach(a=>{
-  const c = a.style.getPropertyValue('--nm');
-  a.addEventListener('mouseenter', ()=>setAccent(c));
-  a.addEventListener('focus',      ()=>setAccent(c));
-});
-
-/* фильтры */
-const chips = document.getElementById('chips');
-const filters = [{id:'all',title:'Все'}].concat(GROUPS.map(g=>({id:g.id,title:g.title})));
-chips.innerHTML = filters.map((f,i)=>
-  `<button class="chip" data-filter="${f.id}" aria-pressed="${i===0}">${f.title}</button>`).join('');
-chips.addEventListener('click', e=>{
-  const btn = e.target.closest('.chip'); if(!btn) return;
-  chips.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed', c===btn));
-  const f = btn.dataset.filter;
-  document.querySelectorAll('.group').forEach(s=>{ s.hidden = f!=='all' && s.dataset.group!==f; });
-});
-
-/* динамический цвет: акцент следует за человеком в фокусе */
-let current = '';
-function setAccent(c){
-  if(!c || c===current) return;
-  current = c;
-  document.documentElement.style.setProperty('--accent', c);
-}
-const io = new IntersectionObserver(entries=>{
-  entries.forEach(en=>{
-    if(en.isIntersecting){
-      en.target.classList.add('in');
-      setAccent(en.target.dataset.accent);
-    }
+    list.appendChild(sec);
   });
-},{rootMargin:'-45% 0px -45% 0px'});
-document.querySelectorAll('.person').forEach(el=>io.observe(el));
 
-/* появление карточек */
-const reveal = new IntersectionObserver(entries=>{
-  entries.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add('in'); reveal.unobserve(en.target); } });
-},{rootMargin:'0px 0px -10% 0px'});
-document.querySelectorAll('.person').forEach(el=>reveal.observe(el));
+  document.getElementById('markCount').textContent = PEOPLE.length;
+}
 
-/* тема. При размещении на своём хостинге можно раскомментировать сохранение:
-   localStorage.setItem('theme', t) / localStorage.getItem('theme') */
-document.getElementById('themeBtn').addEventListener('click', ()=>{
-  const root = document.documentElement;
-  root.dataset.theme = root.dataset.theme==='dark' ? 'light' : 'dark';
+function applyFilterAndSearch() {
+  const query = searchInput.value.trim().toLowerCase();
+  let totalVisible = 0;
+
+  GROUPS.forEach(g => {
+    const groupEl = document.querySelector(`.group[data-group="${g.id}"]`);
+    if (!groupEl) return;
+
+    const cards = groupEl.querySelectorAll('.person');
+    let visibleInGroup = 0;
+
+    cards.forEach(card => {
+      const p = card.personData;
+      const matchesGroup = activeGroup === 'all' || p.group === activeGroup;
+      const matchesSphere = activeSphere === 'all' || p.sphere === activeSphere;
+      const matchesSearch = !query || 
+        p.name.toLowerCase().includes(query) ||
+        p.role.toLowerCase().includes(query) ||
+        p.text.toLowerCase().includes(query) ||
+        (p.fullBio && p.fullBio.toLowerCase().includes(query)) ||
+        (p.record && p.record.toLowerCase().includes(query));
+
+      const isVisible = matchesGroup && matchesSphere && matchesSearch;
+      card.hidden = !isVisible;
+
+      if (isVisible) {
+        visibleInGroup++;
+        totalVisible++;
+      }
+    });
+
+    groupEl.hidden = visibleInGroup === 0;
+  });
+
+  document.getElementById('emptyState').hidden = totalVisible > 0;
+}
+
+function updateView(callback) {
+  if (document.startViewTransition) {
+    document.startViewTransition(callback);
+  } else {
+    callback();
+  }
+}
+
+/* Открытие модального окна и блокировка скролла фона */
+function openModal(person) {
+  modal.style.setProperty('--pc', person.accent);
+  
+  const mPortrait = document.getElementById('modalPortrait');
+  mPortrait.innerHTML = person.photo 
+    ? `<img src="${person.photo}" alt="${person.name}">` 
+    : `<span class="initials">${initials(person.name)}</span>`;
+
+  document.getElementById('modalMeta').textContent = `${person.years} · ${person.role}`;
+  document.getElementById('modalName').textContent = person.name;
+  document.getElementById('modalRecord').textContent = person.record;
+
+  const mQuote = document.getElementById('modalQuote');
+  if (person.quote) {
+    mQuote.textContent = `«${person.quote}»`;
+    mQuote.hidden = false;
+  } else {
+    mQuote.hidden = true;
+  }
+
+  const mBio = document.getElementById('modalBio');
+  mBio.innerHTML = (person.fullBio || person.text)
+    .split('\n\n')
+    .map(para => `<p>${para}</p>`)
+    .join('');
+
+  // Хронология
+  const mTimelineSec = document.getElementById('modalTimelineSec');
+  const mTimeline = document.getElementById('modalTimeline');
+  if (person.timeline && person.timeline.length) {
+    mTimelineSec.hidden = false;
+    mTimeline.innerHTML = person.timeline.map(item => `
+      <div class="timeline-item">
+        <div class="timeline-year">${item.year}</div>
+        <div class="timeline-text">${item.text}</div>
+      </div>
+    `).join('');
+  } else {
+    mTimelineSec.hidden = true;
+  }
+
+  // Ссылки
+  const mLinksSec = document.getElementById('modalLinksSec');
+  const mLinks = document.getElementById('modalLinks');
+  if (person.links && person.links.length) {
+    mLinksSec.hidden = false;
+    mLinks.innerHTML = person.links.map(l => `
+      <a href="${l.url}" target="_blank" rel="noopener" class="modal-link-btn">🌐 ${l.title}</a>
+    `).join('');
+  } else {
+    mLinksSec.hidden = true;
+  }
+
+  document.getElementById('modalShareBtn').onclick = () => copyShareLink(person);
+
+  // Блокируем скролл фона
+  document.body.classList.add('modal-open');
+  modal.showModal();
+  history.pushState(null, '', `#${slug(person.name)}`);
+}
+
+function closeModal() {
+  modal.close();
+  document.body.classList.remove('modal-open');
+}
+
+document.getElementById('modalClose').onclick = () => closeModal();
+modal.addEventListener('click', (e) => {
+  const rect = modal.getBoundingClientRect();
+  if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
+    closeModal();
+  }
+});
+modal.addEventListener('cancel', () => {
+  document.body.classList.remove('modal-open');
+});
+
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2600);
+}
+
+function copyShareLink(person) {
+  const link = `${window.location.origin}${window.location.pathname}#${slug(person.name)}`;
+  navigator.clipboard.writeText(link).then(() => {
+    showToast('Прямая ссылка скопирована');
+  }).catch(() => {
+    showToast('Не удалось скопировать ссылку');
+  });
+}
+
+function initNamewall() {
+  const wall = document.getElementById('namewall');
+  wall.innerHTML = PEOPLE.map(p =>
+    `<a href="#${slug(p.name)}" style="--nm:${p.accent}" class="${p.group === 'killed' || (p.group === 'dissidents' && p.years.includes('—')) ? 'gone' : ''}" data-slug="${slug(p.name)}">${p.name}</a>`
+  ).join('<span aria-hidden="true"> · </span>');
+
+  wall.querySelectorAll('a').forEach(a => {
+    const color = a.style.getPropertyValue('--nm');
+    a.addEventListener('mouseenter', () => setAccent(color));
+    a.addEventListener('focus', () => setAccent(color));
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const p = PEOPLE.find(item => slug(item.name) === a.dataset.slug);
+      if (p) openModal(p);
+    });
+  });
+
+  wall.addEventListener('mouseleave', () => setAccent(currentObservedAccent));
+}
+
+function initChips() {
+  // Статусы
+  const statusFilters = [{ id: 'all', title: 'Все статусы' }].concat(GROUPS.map(g => ({ id: g.id, title: g.title })));
+  statusChips.innerHTML = statusFilters.map((f, i) =>
+    `<button class="chip" data-status="${f.id}" aria-pressed="${i === 0}">${f.title}</button>`
+  ).join('');
+
+  statusChips.addEventListener('click', e => {
+    const btn = e.target.closest('.chip');
+    if (!btn) return;
+    statusChips.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === btn));
+    activeGroup = btn.dataset.status;
+    updateView(() => applyFilterAndSearch());
+  });
+
+  // Сферы
+  sphereChips.innerHTML = SPHERES.map((s, i) =>
+    `<button class="chip" data-sphere="${s.id}" aria-pressed="${i === 0}">${s.title}</button>`
+  ).join('');
+
+  sphereChips.addEventListener('click', e => {
+    const btn = e.target.closest('.chip');
+    if (!btn) return;
+    sphereChips.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c === btn));
+    activeSphere = btn.dataset.sphere;
+    updateView(() => applyFilterAndSearch());
+  });
+}
+
+searchInput.addEventListener('input', () => {
+  clearSearch.hidden = !searchInput.value;
+  updateView(() => applyFilterAndSearch());
+});
+
+clearSearch.addEventListener('click', () => {
+  searchInput.value = '';
+  clearSearch.hidden = true;
+  searchInput.focus();
+  updateView(() => applyFilterAndSearch());
+});
+
+function initObserver() {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        const accent = entry.target.dataset.accent;
+        if (accent) {
+          currentObservedAccent = accent;
+          setAccent(accent);
+        }
+      }
+    });
+  }, { rootMargin: '-25% 0px -25% 0px' });
+
+  document.querySelectorAll('.person').forEach(el => observer.observe(el));
+}
+
+// Кнопка Наверх
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 400) {
+    backToTopBtn.classList.add('show');
+  } else {
+    backToTopBtn.classList.remove('show');
+  }
+});
+
+backToTopBtn.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// Сохранение темы
+const themeBtn = document.getElementById('themeBtn');
+const savedTheme = localStorage.getItem('theme') || 'dark';
+document.documentElement.dataset.theme = savedTheme;
+
+themeBtn.addEventListener('click', () => {
+  const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = nextTheme;
+  localStorage.setItem('theme', nextTheme);
+});
+
+// Старт приложения
+document.addEventListener('DOMContentLoaded', () => {
+  renderList();
+  initNamewall();
+  initChips();
+  initObserver();
+
+  if (window.location.hash) {
+    const targetSlug = window.location.hash.substring(1);
+    const person = PEOPLE.find(p => slug(p.name) === targetSlug);
+    if (person) {
+      setTimeout(() => openModal(person), 300);
+    }
+  }
 });
 </script>
 </body>
