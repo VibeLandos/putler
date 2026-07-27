@@ -1774,7 +1774,6 @@ function updateNavButtons() {
 function openModal(person) {
   if (isClosing) return;
   
-  // Сохраняем позицию скролла только при первом открытии
   if (!modal.open) {
     savedScrollPosition = window.scrollY;
   }
@@ -1894,7 +1893,7 @@ function closeModal() {
   setTimeout(() => {
     if (openedFromHash && highlightSlug) {
       const card = document.getElementById(highlightSlug);
-      if (card) {
+      if (card && !card.hidden) {
         card.scrollIntoView({ block: 'center', behavior: 'smooth' });
         card.classList.add('highlighted');
         setTimeout(() => {
@@ -1902,6 +1901,10 @@ function closeModal() {
           openedFromHash = false;
           highlightSlug = null;
         }, 3000);
+      } else {
+        openedFromHash = false;
+        highlightSlug = null;
+        window.scrollTo({ top: savedScrollPosition, behavior: 'auto' });
       }
     } else {
       window.scrollTo({ top: savedScrollPosition, behavior: 'auto' });
@@ -2111,13 +2114,20 @@ function initObserver() {
       if (entry.isIntersecting) {
         entry.target.classList.add('in');
         
-        const onTransEnd = (e) => {
-          if (e.propertyName === 'opacity') {
-            entry.target.style.transitionDelay = '0s';
-            entry.target.removeEventListener('transitionend', onTransEnd);
-          }
-        };
-        entry.target.addEventListener('transitionend', onTransEnd);
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReducedMotion) {
+          entry.target.style.transitionDelay = '0s';
+        } else if (!entry.target.dataset.transitionListenerAdded) {
+          entry.target.dataset.transitionListenerAdded = 'true';
+          const onTransEnd = (e) => {
+            if (e.propertyName === 'opacity') {
+              entry.target.style.transitionDelay = '0s';
+              entry.target.removeEventListener('transitionend', onTransEnd);
+              delete entry.target.dataset.transitionListenerAdded;
+            }
+          };
+          entry.target.addEventListener('transitionend', onTransEnd);
+        }
 
         const accent = entry.target.dataset.accent;
         if (accent) {
