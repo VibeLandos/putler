@@ -214,7 +214,6 @@ h1 {
 .namewall a.gone { text-decoration: line-through; opacity: .65; }
 .wall-key { font-size: 12px; color: var(--on-variant); opacity: .8; margin: 0 0 48px; }
 
-/* Tooltip для namewall */
 .namewall-tooltip {
   position: fixed;
   z-index: 1000;
@@ -358,13 +357,12 @@ h1 {
 .person.flip { grid-template-columns: 1fr 200px; }
 .person.flip .portrait { order: 2; }
 
-/* Pulse animation для подсветки карточки */
 @keyframes pulse-highlight {
   0%, 100% {
     box-shadow: 0 0 0 0 color-mix(in oklab, var(--pc, var(--accent)) 60%, transparent);
   }
   50% {
-    box-shadow: 0 0 0 8px color-mix(in oklab, var(--pc, var(--accent)) 30%, transparent);
+    box-shadow: 0 0 0 10px color-mix(in oklab, var(--pc, var(--accent)) 40%, transparent);
   }
 }
 
@@ -727,7 +725,6 @@ footer .download-btn:hover {
   .person.highlighted { animation: none; }
 }
 
-/* Print styles */
 @media print {
   body {
     background: #fff !important;
@@ -803,7 +800,7 @@ footer .download-btn:hover {
   <section class="hero">
     <p class="eyebrow">Россия · советский период и современность</p>
     <h1>Список тех, кто не согласился</h1>
-    <p class="lede">Политики, журналисты, правозащитники, деятели культуры и науки, которые публично выступили против репрессий и произвола. <b id="storiesCount">58 историй личного мужества и гражданского выбора.</b></p>
+    <p class="lede">Политики, журналисты, правозащитники, деятели культуры и науки, которые публично выступили против репрессий и произвола. <b id="storiesCount"></b></p>
 
     <nav class="namewall" id="namewall" aria-label="Все имена"></nav>
     <p class="wall-key"><s>Зачёркнуты</s> — те, кого убили или кто умер под стражей. Нажмите на имя, чтобы открыть подробности.</p>
@@ -885,7 +882,6 @@ footer .download-btn:hover {
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-<!-- Tooltip для namewall -->
 <div id="namewallTooltip" class="namewall-tooltip"></div>
 
 <script>
@@ -1613,12 +1609,23 @@ let modalVisibleList = [];
 let currentPersonIndex = -1;
 let isClosing = false;
 let savedScrollPosition = 0;
+let openedFromHash = false;
+let highlightSlug = null;
 
 const initials = n => n.split(' ').map(w => w[0]).slice(0, 2).join('');
 
 function setAccent(color) {
   if (!color) return;
   document.documentElement.style.setProperty('--accent', color);
+}
+
+function pluralize(n, one, two, many) {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod100 >= 11 && mod100 <= 19) return many;
+  if (mod10 === 1) return one;
+  if (mod10 >= 2 && mod10 <= 4) return two;
+  return many;
 }
 
 function renderList() {
@@ -1650,9 +1657,6 @@ function renderList() {
       article.tabIndex = 0;
       article.setAttribute('role', 'button');
       article.setAttribute('aria-label', `Подробнее о ${p.name}`);
-      
-      // Staggered animation delay
-      article.style.transitionDelay = `${i * 0.05}s`;
 
       article.innerHTML = `
         <div class="portrait">
@@ -1767,11 +1771,13 @@ function updateNavButtons() {
   nextBtn.disabled = currentPersonIndex >= modalVisibleList.length - 1 || currentPersonIndex === -1;
 }
 
-function openModal(person, highlight = false) {
+function openModal(person) {
   if (isClosing) return;
   
-  // Сохраняем позицию скролла перед открытием
-  savedScrollPosition = window.scrollY;
+  // Сохраняем позицию скролла только при первом открытии
+  if (!modal.open) {
+    savedScrollPosition = window.scrollY;
+  }
   
   modal.style.setProperty('--pc', person.accent);
   
@@ -1872,15 +1878,6 @@ function openModal(person, highlight = false) {
     history.replaceState({ modal: true, person: person.name }, '', newHash);
   }
   
-  // Подсветка карточки если открыта по хешу
-  if (highlight) {
-    const card = document.getElementById(person.slug);
-    if (card) {
-      card.classList.add('highlighted');
-      setTimeout(() => card.classList.remove('highlighted'), 3000);
-    }
-  }
-  
   setTimeout(() => {
     document.getElementById('modalClose').focus();
   }, 50);
@@ -1894,9 +1891,22 @@ function closeModal() {
   document.body.classList.remove('modal-open');
   history.replaceState(null, '', window.location.pathname + window.location.search);
   
-  // Восстанавливаем позицию скролла
   setTimeout(() => {
-    window.scrollTo({ top: savedScrollPosition, behavior: 'auto' });
+    if (openedFromHash && highlightSlug) {
+      const card = document.getElementById(highlightSlug);
+      if (card) {
+        card.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        card.classList.add('highlighted');
+        setTimeout(() => {
+          card.classList.remove('highlighted');
+          openedFromHash = false;
+          highlightSlug = null;
+        }, 3000);
+      }
+    } else {
+      window.scrollTo({ top: savedScrollPosition, behavior: 'auto' });
+    }
+    
     isClosing = false;
   }, 100);
 }
@@ -1956,15 +1966,15 @@ function showToast(msg) {
 function copyShareLink(person) {
   const link = `${window.location.origin}${window.location.pathname}#${person.slug}`;
   
-  // Web Share API для мобильных
   if (navigator.canShare && navigator.share) {
     navigator.share({
       title: person.name,
       text: `${person.role} · ${person.record}`,
       url: link
-    }).catch(() => {
-      // Fallback на копирование
-      fallbackCopyToClipboard(link);
+    }).catch((err) => {
+      if (err.name !== 'AbortError') {
+        fallbackCopyToClipboard(link);
+      }
     });
   } else {
     fallbackCopyToClipboard(link);
@@ -2013,11 +2023,19 @@ function initNamewall() {
     a.addEventListener('mouseenter', () => {
       setAccent(color);
       
-      // Показываем tooltip с задержкой
       tooltipTimeout = setTimeout(() => {
         const rect = a.getBoundingClientRect();
+        const tooltipWidth = 280;
+        let left = rect.left + rect.width / 2;
+        
+        if (left - tooltipWidth / 2 < 10) {
+          left = tooltipWidth / 2 + 10;
+        } else if (left + tooltipWidth / 2 > window.innerWidth - 10) {
+          left = window.innerWidth - tooltipWidth / 2 - 10;
+        }
+        
         namewallTooltip.textContent = `${a.dataset.role} · ${a.dataset.years}`;
-        namewallTooltip.style.left = `${rect.left + rect.width / 2}px`;
+        namewallTooltip.style.left = `${left}px`;
         namewallTooltip.style.top = `${rect.bottom + 8}px`;
         namewallTooltip.style.transform = 'translateX(-50%)';
         namewallTooltip.classList.add('show');
@@ -2040,6 +2058,10 @@ function initNamewall() {
       if (p) openModal(p);
     });
   });
+  
+  window.addEventListener('scroll', () => {
+    namewallTooltip.classList.remove('show');
+  }, { passive: true });
 }
 
 function initChips() {
@@ -2088,6 +2110,15 @@ function initObserver() {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('in');
+        
+        const onTransEnd = (e) => {
+          if (e.propertyName === 'opacity') {
+            entry.target.style.transitionDelay = '0s';
+            entry.target.removeEventListener('transitionend', onTransEnd);
+          }
+        };
+        entry.target.addEventListener('transitionend', onTransEnd);
+
         const accent = entry.target.dataset.accent;
         if (accent) {
           currentObservedAccent = accent;
@@ -2097,7 +2128,10 @@ function initObserver() {
     });
   }, { rootMargin: '-25% 0px -25% 0px' });
 
-  document.querySelectorAll('.person').forEach(el => observer.observe(el));
+  document.querySelectorAll('.person').forEach((el, i) => {
+    el.style.transitionDelay = `${(i % 6) * 0.05}s`;
+    observer.observe(el);
+  });
 }
 
 let scrollTimeout;
@@ -2128,7 +2162,6 @@ themeBtn.addEventListener('click', () => {
   localStorage.setItem('theme', nextTheme);
 });
 
-// Скачивание JSON
 document.getElementById('downloadJson').addEventListener('click', () => {
   const data = {
     title: "Список тех, кто не согласился",
@@ -2177,9 +2210,9 @@ function initSlugs() {
 document.addEventListener('DOMContentLoaded', () => {
   initSlugs();
   
-  // Обновляем счётчик историй динамически
+  const count = PEOPLE.length;
   document.getElementById('storiesCount').textContent = 
-    `${PEOPLE.length} историй личного мужества и гражданского выбора.`;
+    `${count} ${pluralize(count, 'история', 'истории', 'историй')} личного мужества и гражданского выбора.`;
   
   renderList();
   initNamewall();
@@ -2191,7 +2224,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const targetSlug = window.location.hash.substring(1);
     const person = PEOPLE.find(p => p.slug === targetSlug);
     if (person) {
-      setTimeout(() => openModal(person, true), 300);
+      openedFromHash = true;
+      highlightSlug = person.slug;
+      setTimeout(() => openModal(person), 300);
     }
   }
 });
