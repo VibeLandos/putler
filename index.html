@@ -204,6 +204,7 @@ h1 {
   padding: 2px 6px; 
   border-radius: 6px;
   transition: color .25s var(--ease), background .25s var(--ease);
+  position: relative;
 }
 .namewall a:hover, .namewall a:focus-visible {
   color: var(--surface); 
@@ -212,6 +213,26 @@ h1 {
 }
 .namewall a.gone { text-decoration: line-through; opacity: .65; }
 .wall-key { font-size: 12px; color: var(--on-variant); opacity: .8; margin: 0 0 48px; }
+
+/* Tooltip для namewall */
+.namewall-tooltip {
+  position: fixed;
+  z-index: 1000;
+  padding: 8px 12px;
+  background: var(--container-high);
+  color: var(--on-surface);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-s);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .2s var(--ease);
+  max-width: 280px;
+}
+.namewall-tooltip.show { opacity: 1; }
 
 .controls-bar {
   display: flex;
@@ -336,6 +357,20 @@ h1 {
 .person:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .person.flip { grid-template-columns: 1fr 200px; }
 .person.flip .portrait { order: 2; }
+
+/* Pulse animation для подсветки карточки */
+@keyframes pulse-highlight {
+  0%, 100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--pc, var(--accent)) 60%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 8px color-mix(in oklab, var(--pc, var(--accent)) 30%, transparent);
+  }
+}
+
+.person.highlighted {
+  animation: pulse-highlight 1.5s var(--ease-smooth) 2;
+}
 
 .portrait {
   position: relative; 
@@ -645,6 +680,26 @@ footer h4 { font-family: 'Unbounded', sans-serif; font-weight: 400; font-size: 1
 footer a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
 footer a:hover { border-bottom-color: currentColor; }
 footer p { max-width: 66ch; margin: 0 0 14px; }
+footer .download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--container-high);
+  color: var(--on-surface);
+  border: 1px solid var(--outline);
+  border-radius: var(--radius-s);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  margin-top: 12px;
+}
+footer .download-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
 
 @media (max-width: 760px) {
   body { font-size: 16px; }
@@ -669,6 +724,69 @@ footer p { max-width: 66ch; margin: 0 0 14px; }
   }
   html { scroll-behavior: auto; }
   .person { opacity: 1; transform: none; }
+  .person.highlighted { animation: none; }
+}
+
+/* Print styles */
+@media print {
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+  
+  .topbar, .controls-bar, .namewall, .wall-key, .back-to-top, .toast, .skip-link,
+  .modal-footer, .card-actions, footer .download-btn, #themeBtn {
+    display: none !important;
+  }
+  
+  .wrap { max-width: 100%; padding: 0; }
+  
+  .hero { padding: 20px 0; }
+  .hero h1 { font-size: 24pt; margin-bottom: 12px; }
+  .lede { font-size: 12pt; margin-bottom: 20px; }
+  
+  .group { margin: 0 0 30px; page-break-inside: avoid; }
+  .group-head { margin-bottom: 16px; }
+  .group-head h2 { font-size: 16pt; }
+  
+  .person, .person.flip {
+    grid-template-columns: 1fr;
+    opacity: 1 !important;
+    transform: none !important;
+    border: 1px solid #ccc;
+    padding: 12px;
+    margin: 0 0 12px;
+    page-break-inside: avoid;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+  
+  .portrait { display: none; }
+  .person h3 { font-size: 13pt; margin: 0 0 4px; }
+  .meta { font-size: 9pt; margin: 0 0 6px; }
+  .text { font-size: 10pt; margin: 0 0 8px; }
+  .record { font-size: 9pt; background: #f0f0f0 !important; }
+  
+  a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+  
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    font-weight: normal;
+  }
+  
+  footer {
+    border-top: 1px solid #ccc;
+    padding: 20px 0;
+    page-break-before: always;
+  }
+  
+  footer h4 { font-size: 12pt; }
+  footer p { font-size: 10pt; }
 }
 </style>
 </head>
@@ -685,7 +803,7 @@ footer p { max-width: 66ch; margin: 0 0 14px; }
   <section class="hero">
     <p class="eyebrow">Россия · советский период и современность</p>
     <h1>Список тех, кто не согласился</h1>
-    <p class="lede">Политики, журналисты, правозащитники, деятели культуры и науки, которые публично выступили против репрессий и произвола. <b>50 историй личного мужества и гражданского выбора.</b></p>
+    <p class="lede">Политики, журналисты, правозащитники, деятели культуры и науки, которые публично выступили против репрессий и произвола. <b id="storiesCount">58 историй личного мужества и гражданского выбора.</b></p>
 
     <nav class="namewall" id="namewall" aria-label="Все имена"></nav>
     <p class="wall-key"><s>Зачёркнуты</s> — те, кого убили или кто умер под стражей. Нажмите на имя, чтобы открыть подробности.</p>
@@ -722,6 +840,9 @@ footer p { max-width: 66ch; margin: 0 0 14px; }
     <h4>Об источниках</h4>
     <p>Сведения собраны по открытым источникам, материалам правозащитного центра «Мемориал» (<a href="https://memopzk.org" target="_blank" rel="noopener">memopzk.org</a>) и <a href="https://ovd.info" target="_blank" rel="noopener">ОВД-Инфо</a>.</p>
     <p>Данные актуализированы по состоянию на 2026 год.</p>
+    <button id="downloadJson" class="download-btn" aria-label="Скачать данные в формате JSON">
+      <span>⬇</span> Скачать данные (JSON)
+    </button>
   </footer>
 </div>
 
@@ -763,6 +884,9 @@ footer p { max-width: 66ch; margin: 0 0 14px; }
 <button id="backToTop" class="back-to-top" aria-label="Вернуться наверх">↑</button>
 
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<!-- Tooltip для namewall -->
+<div id="namewallTooltip" class="namewall-tooltip"></div>
 
 <script>
 const PEOPLE = [
@@ -1480,6 +1604,7 @@ const modal = document.getElementById('modal');
 const toast = document.getElementById('toast');
 const backToTopBtn = document.getElementById('backToTop');
 const resultsStatus = document.getElementById('resultsStatus');
+const namewallTooltip = document.getElementById('namewallTooltip');
 
 let activeGroup = 'all';
 let activeSphere = 'all';
@@ -1487,6 +1612,7 @@ let currentObservedAccent = '#E53935';
 let modalVisibleList = [];
 let currentPersonIndex = -1;
 let isClosing = false;
+let savedScrollPosition = 0;
 
 const initials = n => n.split(' ').map(w => w[0]).slice(0, 2).join('');
 
@@ -1524,6 +1650,9 @@ function renderList() {
       article.tabIndex = 0;
       article.setAttribute('role', 'button');
       article.setAttribute('aria-label', `Подробнее о ${p.name}`);
+      
+      // Staggered animation delay
+      article.style.transitionDelay = `${i * 0.05}s`;
 
       article.innerHTML = `
         <div class="portrait">
@@ -1638,8 +1767,11 @@ function updateNavButtons() {
   nextBtn.disabled = currentPersonIndex >= modalVisibleList.length - 1 || currentPersonIndex === -1;
 }
 
-function openModal(person) {
+function openModal(person, highlight = false) {
   if (isClosing) return;
+  
+  // Сохраняем позицию скролла перед открытием
+  savedScrollPosition = window.scrollY;
   
   modal.style.setProperty('--pc', person.accent);
   
@@ -1740,6 +1872,15 @@ function openModal(person) {
     history.replaceState({ modal: true, person: person.name }, '', newHash);
   }
   
+  // Подсветка карточки если открыта по хешу
+  if (highlight) {
+    const card = document.getElementById(person.slug);
+    if (card) {
+      card.classList.add('highlighted');
+      setTimeout(() => card.classList.remove('highlighted'), 3000);
+    }
+  }
+  
   setTimeout(() => {
     document.getElementById('modalClose').focus();
   }, 50);
@@ -1753,9 +1894,11 @@ function closeModal() {
   document.body.classList.remove('modal-open');
   history.replaceState(null, '', window.location.pathname + window.location.search);
   
+  // Восстанавливаем позицию скролла
   setTimeout(() => {
+    window.scrollTo({ top: savedScrollPosition, behavior: 'auto' });
     isClosing = false;
-  }, 300);
+  }, 100);
 }
 
 document.getElementById('modalClose').onclick = () => closeModal();
@@ -1813,18 +1956,34 @@ function showToast(msg) {
 function copyShareLink(person) {
   const link = `${window.location.origin}${window.location.pathname}#${person.slug}`;
   
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(link).then(() => {
-      showToast('Прямая ссылка скопирована');
+  // Web Share API для мобильных
+  if (navigator.canShare && navigator.share) {
+    navigator.share({
+      title: person.name,
+      text: `${person.role} · ${person.record}`,
+      url: link
     }).catch(() => {
-      fallbackCopy(link);
+      // Fallback на копирование
+      fallbackCopyToClipboard(link);
     });
   } else {
-    fallbackCopy(link);
+    fallbackCopyToClipboard(link);
   }
 }
 
-function fallbackCopy(text) {
+function fallbackCopyToClipboard(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('Прямая ссылка скопирована');
+    }).catch(() => {
+      legacyCopy(text);
+    });
+  } else {
+    legacyCopy(text);
+  }
+}
+
+function legacyCopy(text) {
   const textarea = document.createElement('textarea');
   textarea.value = text;
   textarea.style.position = 'fixed';
@@ -1842,24 +2001,45 @@ function fallbackCopy(text) {
 
 function initNamewall() {
   const wall = document.getElementById('namewall');
+  let tooltipTimeout;
+  
   wall.innerHTML = PEOPLE.map(p =>
-    `<a href="#${p.slug}" style="--nm:${p.accent}" class="${p.deceased ? 'gone' : ''}" data-name="${p.name}">${p.name}</a>`
+    `<a href="#${p.slug}" style="--nm:${p.accent}" class="${p.deceased ? 'gone' : ''}" data-name="${p.name}" data-role="${p.role}" data-years="${p.years}">${p.name}</a>`
   ).join('<span aria-hidden="true"> · </span>');
 
   wall.querySelectorAll('a').forEach(a => {
     const color = a.style.getPropertyValue('--nm');
     
-    a.addEventListener('mouseenter', () => setAccent(color));
+    a.addEventListener('mouseenter', () => {
+      setAccent(color);
+      
+      // Показываем tooltip с задержкой
+      tooltipTimeout = setTimeout(() => {
+        const rect = a.getBoundingClientRect();
+        namewallTooltip.textContent = `${a.dataset.role} · ${a.dataset.years}`;
+        namewallTooltip.style.left = `${rect.left + rect.width / 2}px`;
+        namewallTooltip.style.top = `${rect.bottom + 8}px`;
+        namewallTooltip.style.transform = 'translateX(-50%)';
+        namewallTooltip.classList.add('show');
+      }, 400);
+    });
+    
+    a.addEventListener('mouseleave', () => {
+      clearTimeout(tooltipTimeout);
+      namewallTooltip.classList.remove('show');
+      setAccent(currentObservedAccent);
+    });
+    
     a.addEventListener('focus', () => setAccent(color));
     
     a.addEventListener('click', (e) => {
       e.preventDefault();
+      clearTimeout(tooltipTimeout);
+      namewallTooltip.classList.remove('show');
       const p = PEOPLE.find(item => item.name === a.dataset.name);
       if (p) openModal(p);
     });
   });
-
-  wall.addEventListener('mouseleave', () => setAccent(currentObservedAccent));
 }
 
 function initChips() {
@@ -1948,6 +2128,42 @@ themeBtn.addEventListener('click', () => {
   localStorage.setItem('theme', nextTheme);
 });
 
+// Скачивание JSON
+document.getElementById('downloadJson').addEventListener('click', () => {
+  const data = {
+    title: "Список тех, кто не согласился",
+    description: "Реестр российских политиков, журналистов, правозащитников, деятелей культуры и науки",
+    date: new Date().toISOString().split('T')[0],
+    count: PEOPLE.length,
+    people: PEOPLE.map(p => ({
+      name: p.name,
+      years: p.years,
+      role: p.role,
+      group: p.group,
+      sphere: p.sphere,
+      deceased: p.deceased,
+      text: p.text,
+      fullBio: p.fullBio,
+      quote: p.quote,
+      record: p.record,
+      timeline: p.timeline,
+      links: p.links
+    }))
+  };
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `registry-${data.date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showToast('Данные скачаны');
+});
+
 function initSlugs() {
   const counts = new Map();
   PEOPLE.forEach(p => {
@@ -1960,6 +2176,11 @@ function initSlugs() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initSlugs();
+  
+  // Обновляем счётчик историй динамически
+  document.getElementById('storiesCount').textContent = 
+    `${PEOPLE.length} историй личного мужества и гражданского выбора.`;
+  
   renderList();
   initNamewall();
   initChips();
@@ -1970,7 +2191,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const targetSlug = window.location.hash.substring(1);
     const person = PEOPLE.find(p => p.slug === targetSlug);
     if (person) {
-      setTimeout(() => openModal(person), 300);
+      setTimeout(() => openModal(person, true), 300);
     }
   }
 });
